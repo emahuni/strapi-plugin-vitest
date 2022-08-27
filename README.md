@@ -1,6 +1,6 @@
 # Strapi plugin Vitest
 
-Strapi plugin creates a Vitest unit testing harness, that loads Strapi in `strapi develop` allowing you to watch for changes and run tests from seperate tests files without reloading the singlton. You don't have to require your tests from the `app.test.js` file, each test file is independent of others.
+Strapi plugin creates a Vitest unit testing harness, that loads Strapi in `strapi develop` allowing you to watch for changes and run tests from separate tests files without reloading the singlton. You don't have to require your tests from the `app.test.js` file, each test file is independent of others.
 
 
 ### Details
