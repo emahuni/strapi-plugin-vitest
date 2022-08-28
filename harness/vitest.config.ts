@@ -10,6 +10,7 @@ export default defineConfig({
     outputTruncateLength: 200,
     passWithNoTests:      false,
     allowOnly:            true,
+    teardownTimeout:      4000,
     globalSetup:          [
       'tests/helpers/global-setup.ts',
     ],
