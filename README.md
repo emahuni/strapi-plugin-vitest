@@ -95,7 +95,7 @@ code. For example, you can run specific test that match title = `validate my-plu
 yarn test -t "my-plugin"
 ```
 
-Read Vitest documentation for more information.
+Read Vitest [filtering documentation](https://vitest.dev/guide/filtering.html) for more information.
 
 See example test file `app.test.js`, you can generate other test files like that and just run them as usual, without adding them to a main test file.
 
