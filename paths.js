@@ -10,8 +10,8 @@ const isTS = existsSync(resolve(PWD, 'src/'));
 const TEST_ENV_DB_CONFIG_DIR = resolve(PWD, `config/env/test/`);
 const TEST_ENV_DB_CONFIG_FILE = resolve(TEST_ENV_DB_CONFIG_DIR, `database.${isTS ? 'ts' : 'js'}`);
 const TEST_HARNESS_DB_CONFIG_FILE = resolve(PLUGIN_DIR_PATH, `harness/database.${isTS ? 'ts' : 'js'}`);
-const TEST_HARNESS_VITEST_CONFIG_FILE = resolve(PLUGIN_DIR_PATH, `harness/vitest.config.ts`);
-const VITEST_CONFIG_FILE = resolve(PWD, `vitest.config.ts`);
+const TEST_HARNESS_VITEST_CONFIG_FILE = resolve(PLUGIN_DIR_PATH, `harness/vitest.config.js`);
+const VITEST_CONFIG_FILE = resolve(PWD, `vitest.config.js`);
 
 const TEST_DIR_HELPERS_PATH = resolve(TEST_DIR_PATH, 'helpers');
 const TEST_HARNESS_HELPERS_PATH = resolve(TEST_HARNESS_PATH, 'helpers');
