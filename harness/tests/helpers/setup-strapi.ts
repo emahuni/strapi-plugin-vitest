@@ -4,6 +4,7 @@ import { afterAll, beforeAll } from 'vitest';
 
 import StrapiStart from '@strapi/strapi/lib/commands/start';
 import { createSuperadminAccount } from './strapi-test-utils';
+import chalk from 'chalk';
 
 beforeAll(async (ctx) => {
   if (typeof global.contexts === 'undefined') {
@@ -16,6 +17,7 @@ beforeAll(async (ctx) => {
   // console.debug(`[setup-strapi/beforeAll()()]-13: context: %o`, global.contexts.length);
 
   if (!global.strapiBooted) {
+    const startTime = Date.now();
     global.strapiBooted = true;
 
     envOverride({ envFile: '.env.test' });
@@ -27,7 +29,7 @@ beforeAll(async (ctx) => {
      **/
     const strapi = await StrapiStart({});
     if (!!strapi) {
-      strapi.log.info('Strapi started successfully 🚀');
+      strapi.log.info(`Strapi started successfully 🚀 ` + chalk`{yellow ${Date.now() - startTime}{dim ms}}`);
       // console.debug(`[server/()]-11: strapi: %o`, strapi.db.connection.client.config);
 
       // by default, it creates the admin only when there are no accounts in the DB.

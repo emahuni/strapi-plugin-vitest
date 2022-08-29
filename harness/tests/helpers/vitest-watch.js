@@ -1,6 +1,7 @@
 const chokidar = require('chokidar');
 const { spawn } = require('child_process');
-const debounce = require('lodash.debounce');
+// noinspection NpmUsedModulesInstalled just use the one that ships with Strapi
+const { debounce } = require('lodash');
 
 const yargs = require('yargs/yargs');
 
