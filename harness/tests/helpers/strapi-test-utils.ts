@@ -2,9 +2,7 @@
  * Returns valid JWT token for authenticated
  * @param {String | number} idOrEmail, either user id, or email
  */
-import StrapiStart from '@strapi/strapi/lib/commands/start';
-
-type Strapi = typeof StrapiStart;
+import { Strapi } from '@strapi/strapi';
 
 export async function jwt (idOrEmail) {
   return strapi.plugins['users-permissions'].services.jwt.issue({
@@ -22,18 +20,18 @@ export async function jwt (idOrEmail) {
  * @param {string} policy, default ''
  */
 export async function grantPrivilege (
-  roleID = 1,
-  value,
-  enabled = true,
-  policy = '',
+    roleID = 1,
+    value,
+    enabled = true,
+    policy = '',
 ) {
   const updateObj = value
-    .split('.')
-    .reduceRight((obj, next) => ({ [next]: obj }), { enabled, policy });
-
+      .split('.')
+      .reduceRight((obj, next) => ({ [next]: obj }), { enabled, policy });
+  
   return await strapi.plugins[
-    'users-permissions'
-    ].services.userspermissions.updateRole(roleID, updateObj);
+      'users-permissions'
+      ].services.userspermissions.updateRole(roleID, updateObj);
 }
 
 
@@ -53,20 +51,20 @@ export async function grantPrivileges (roleID = 1, values = []) {
  * @param {*} environment
  */
 export async function updatePluginStore (
-  pluginName,
-  key,
-  newValues,
-  environment = '',
+    pluginName,
+    key,
+    newValues,
+    environment = '',
 ) {
   const pluginStore = strapi.store({
     environment: environment,
     type:        'plugin',
     name:        pluginName,
   });
-
+  
   const oldValues = await pluginStore.get({ key });
   const newValue = Object.assign({}, oldValues, newValues);
-
+  
   return pluginStore.set({ key: key, value: newValue });
 }
 
@@ -83,7 +81,7 @@ export function getPluginStore (pluginName, key, environment = '') {
     type:        'plugin',
     name:        pluginName,
   });
-
+  
   return pluginStore.get({ key });
 }
 
@@ -99,15 +97,15 @@ export function getPluginStore (pluginName, key, environment = '') {
  */
 export function responseHasError (errorId, response) {
   if (
-    response &&
-    response.message &&
-    Array.isArray(response.message) &&
-    response.message.find(
-      (entry) =>
-        entry.messages &&
-        Array.isArray(entry.messages) &&
-        entry.messages.find((msg) => msg.id && msg.id === errorId),
-    )
+      response &&
+      response.message &&
+      Array.isArray(response.message) &&
+      response.message.find(
+          (entry) =>
+              entry.messages &&
+              Array.isArray(entry.messages) &&
+              entry.messages.find((msg) => msg.id && msg.id === errorId),
+      )
   ) {
     return true;
   }
@@ -125,16 +123,18 @@ export function responseHasError (errorId, response) {
  * @returns {Promise<{jwt: string, user: object}>}
  */
 export async function createSuperadminAccount (strapi: Strapi, opts: { email?: string, password?: string, whenNone?: boolean } = {
-  email:    'superadmin@test.co.zw', password: 'Password123', whenNone: true
+  email: 'superadmin@test.co.zw', password: 'Password123', whenNone: true,
 }): Promise<{ jwt: string, user: object }> {
   // create default super admin for functions that use super admin
+  // @ts-expect-error type
   const superAdminRole = await strapi.admin.services.role.getSuperAdmin();
   if (!superAdminRole) {
     throw new Error(
-      'Cannot register the first admin because the super admin role doesn\'t exist.',
+        'Cannot register the first admin because the super admin role doesn\'t exist.',
     );
   }
-
+  
+  // @ts-expect-error type
   const user = await strapi.admin.services.user.create({
     email:             opts.email,
     firstname:         'admin',
@@ -144,11 +144,15 @@ export async function createSuperadminAccount (strapi: Strapi, opts: { email?: s
     isActive:          true,
     roles:             superAdminRole ? [superAdminRole.id] : [],
   });
-
+  
+  // @ts-expect-error type
   strapi.superadmin = {
-    jwt:  strapi.admin.services.token.createJwtToken(user),
+    // @ts-expect-error type
+    jwt: strapi.admin.services.token.createJwtToken(user),
+    // @ts-expect-error type
     user: strapi.admin.services.user.sanitizeUser(user),
   };
-
+  
+  // @ts-expect-error type
   return strapi.superadmin;
 }
