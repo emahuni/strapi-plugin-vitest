@@ -8,10 +8,12 @@
     "kind": "plugin"
   },
   "bin": "vitest-init",
-  "dependencies": {},
   "devDependencies": {
+    "@strapi/strapi": "^4.3.6",
+    "@strapi/typescript-utils": "^4.3.6",
     "@vitest/browser": "^0.22.1",
     "@vitest/ui": "^0.22.1",
+    "chalk": "^5.0.1",
     "chokidar": "^3.5.3",
     "dotenv": "^16.0.1",
     "expect-more-jest": "^5.4.1",
@@ -38,7 +40,7 @@
   ],
   "engines": {
     "node": ">=14.19.1 <=16.x.x",
-    "npm": ">=6.0.0"
+    "yarn": "^1.0.0"
   },
   "scripts": {
     "develop": "tsc -w",

@@ -1,7 +1,7 @@
 const chokidar = require('chokidar');
 const { spawn } = require('child_process');
 // noinspection NpmUsedModulesInstalled just use the one that ships with Strapi
-const { debounce } = require('lodash');
+const debounce = require('lodash.debounce');
 
 const yargs = require('yargs/yargs');
 
@@ -29,7 +29,7 @@ for (const k in argv) {
     args += v.join(' ');
   } else {
     if (/^w$|^watch$/.test(k)) continue; // ignore watch
-
+    
     let kk = k.length > 1 ? `--${k}` : `-${k}`;
     if (typeof v === 'boolean') args += ` ${kk}`;
     else if (typeof v === 'string') args += ` ${kk}=\'${v}\'`;
@@ -43,11 +43,11 @@ startWatching({
   // cwd:              process.env.PWD,
   command:  `yarn vitest ${runMode} ${args}`,
   patterns: vitestConfig.test.forceRerunTriggers ?? '.',
-
+  
   debounce: 400,
   verbose:  false,
   silent:   true,
-
+  
   ignored:            vitestConfig.test.watchExclude ?? null,
   followSymlinks:     true,
   polling:            false,
@@ -73,29 +73,29 @@ const EVENT_DESCRIPTIONS = {
 // Estimates spent working hours based on commit dates
 function startWatching (opts) {
   const watcher = chokidar.watch(opts.patterns, opts);
-
+  
   let debouncedRun = run;
   if (opts.debounce > 0) {
     debouncedRun = debounce(run, opts.debounce);
   }
-
+  
   watcher.on('all', (event, path) => {
     const description = `${EVENT_DESCRIPTIONS[event]}:`;
-
+    
     if (opts.verbose) {
       console.error(description, path);
     } else if (!opts.silent) {
       console.log(`${event}:${path}`);
     }
-
+    
     debouncedRun(opts.command);
   });
-
+  
   watcher.on('error', error => {
     console.error('Error:', error);
     console.error(error.stack);
   });
-
+  
   watcher.once('ready', () => {
     const list = opts.patterns.join('", "');
     if (!opts.silent) {
@@ -107,10 +107,10 @@ function startWatching (opts) {
 
 function run (cmd) {
   return runCmd(cmd)
-    .catch(error => {
-      console.error('Error when executing', cmd);
-      console.error(error.stack);
-    });
+      .catch(error => {
+        console.error('Error when executing', cmd);
+        console.error(error.stack);
+      });
 }
 
 
@@ -127,7 +127,7 @@ function runCmd (cmd, opts) {
     // If we cannot resolve shell, better to just crash
     throw new Error('$SHELL environment variable is not set.');
   }
-
+  
   opts = {
     pipe: true,
     cwd:  process.env.PWD,
@@ -139,10 +139,10 @@ function runCmd (cmd, opts) {
       // spawn
     }, ...opts,
   };
-
+  
   return new Promise((resolve, reject) => {
     let child;
-
+    
     try {
       child = spawn(SHELL_PATH, [EXECUTE_OPTION, cmd], {
         cwd:   opts.cwd,
@@ -151,22 +151,22 @@ function runCmd (cmd, opts) {
     } catch (error) {
       return reject(error);
     }
-
+    
     opts.callback(child);
-
-
+    
+    
     function errorHandler (err) {
       child.removeListener('close', closeHandler);
       reject(err);
     }
-
-
+    
+    
     function closeHandler (exitCode) {
       child.removeListener('error', errorHandler);
       resolve(exitCode);
     }
-
-
+    
+    
     child.once('error', errorHandler);
     child.once('close', closeHandler);
   });
