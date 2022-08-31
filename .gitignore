@@ -97,8 +97,6 @@ results
 node_modules
 .node_history
 
-yarn.lock
-
 ############################
 # Tests
 ############################
@@ -116,3 +114,11 @@ exports
 *.cache
 build
 dist/
+
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

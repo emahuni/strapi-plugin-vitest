@@ -10,7 +10,7 @@
   "bin": {
     "strapi-plugin-vitest-init": "bin/vitest-init"
   },
-  "peerDependencies": {
+  "devDependencies": {
     "@strapi/strapi": "^4.3.6",
     "@strapi/typescript-utils": "^4.3.6",
     "@types/node": "^18.7.14",
@@ -44,7 +44,7 @@
   ],
   "engines": {
     "node": ">=14.19.1 <=16.x.x",
-    "yarn": "^1.0.0"
+    "npm": ">=6.0.0"
   },
   "scripts": {
     "develop": "tsc -w",
