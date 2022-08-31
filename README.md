@@ -30,8 +30,7 @@ npm install -D strapi-plugin-vitest
 To initialize the harness, you need to run the supplied `bin` file:
 
 ```sh
-yarn vitest-init
-# if it fails do:  node ./node_modules/strapi-plugin-vitest/init
+yarn strapi-plugin-vitest-init
 ```
 
 This custom initialization script will: 
@@ -62,7 +61,7 @@ Create or add the following into `tsconfig.json`:
 
 #### `plugins.js|ts` Modifications
 
-Don't forget to enable the plugin in your test plugins configuration. This plugin also cleans the DB based on configuration during tests startup. We did this to allow you to review your tests data after a run, since you can run a single test.
+Don't forget to enable the plugin in your test plugins' configuration. This plugin also cleans the DB based on configuration during tests startup. We did this to allow you to review your tests data after a run, since you can run a single test.
 ```js
 module.exports = {
   vitest: {

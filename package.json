@@ -7,7 +7,9 @@
     "description": "Strapi plugin creates a Vitest unit testing harness, that loads Strapi in `strapi develop` allowing you to watch for changes and run tests from separate tests files without reloading the singlton. You don't have to require your tests from the `app.test.js` file, each test file is independent of others.",
     "kind": "plugin"
   },
-  "bin": "vitest-init",
+  "bin": {
+    "strapi-plugin-vitest-init": "bin/vitest-init"
+  },
   "peerDependencies": {
     "@strapi/strapi": "^4.3.6",
     "@strapi/typescript-utils": "^4.3.6",
