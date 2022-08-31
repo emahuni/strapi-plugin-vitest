@@ -1,5 +1,3 @@
-import pluginPkg from '../../package.json';
+import { id } from '../../pluginId.js';
 
-const pluginId = pluginPkg.name.replace(/^(@[^-,.][\w,-]+\/|strapi-)plugin-/i, '');
-
-export default pluginId;
+export default id;
