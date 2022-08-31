@@ -8,10 +8,7 @@
     "kind": "plugin"
   },
   "bin": "vitest-init",
-  "devDependencies": {
-    "@strapi/strapi": "^4.3.6",
-    "@strapi/typescript-utils": "^4.3.6",
-    "@types/node": "^18.7.14",
+  "peerDependencies": {
     "@vitest/browser": "^0.22.1",
     "@vitest/ui": "^0.22.1",
     "chalk": "^5.0.1",
@@ -26,6 +23,11 @@
     "typescript": "4.6.3",
     "vitest": "^0.22.1",
     "yargs": "^17.5.1"
+  },
+  "devDependencies": {
+    "@strapi/strapi": "^4.3.6",
+    "@strapi/typescript-utils": "^4.3.6",
+    "@types/node": "^18.7.14"
   },
   "author": {
     "name": "Emmanuel Mahuni",
