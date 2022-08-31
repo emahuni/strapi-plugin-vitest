@@ -8,7 +8,7 @@ Strapi plugin creates a Vitest unit testing harness, that loads Strapi in `strap
 This plugin provides a Vitest testing harness to enable easier testing with Strapi. The major advantage here is that Vitest uses Vite and therefore takes advantage of modern js
 that includes running ESM|TS without any transpilation, which runs the test blazingly fast. Read about [Vitest](https://vitest.dev) & Vite to learn more.
 
-Vitest works with Jest and Chai assertions and is very very fast with little simple config needed to use it. 
+Vitest works with Jest and Chai assertions and is very, very fast with little simple config needed to use it. 
 
 The way this harness is made allows for Strapi to run a singleton that can be used by various files without reloading it each time
 for each file; it loads Strapi once, and you just write tests that work in separate isolated files.
