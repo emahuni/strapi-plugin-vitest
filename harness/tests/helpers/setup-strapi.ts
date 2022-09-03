@@ -1,10 +1,24 @@
 import envOverride from 'override.env';
 
-import { afterAll, beforeAll } from 'vitest';
+import { afterAll, beforeAll, Suite, File } from 'vitest';
 
 import StrapiStart from '@strapi/strapi/lib/commands/start';
 import { createSuperadminAccount } from './strapi-test-utils';
 import chalk from 'chalk';
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      contexts: (Suite | File)[];
+      strapiBooted: boolean;
+      __vitest_worker__: {
+        ctx: {
+          files: string[]
+        }
+      };
+    }
+  }
+}
 
 beforeAll(async (ctx) => {
   if (typeof global.contexts === 'undefined') {
