@@ -1,4 +1,5 @@
-// @ts-ignore todo fix this, it's not working as expected
-import { id } from '../../../pluginId.js';
+import pluginPkg from '../../package.json';
 
-export default id;
+const pluginId = pluginPkg.name.replace(/^(@[^-,.][\w,-]+\/|strapi-)plugin-/i, '');
+
+export default pluginId;
