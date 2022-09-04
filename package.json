@@ -16,7 +16,7 @@
     "@types/node": "^18.7.14",
     "@vitest/browser": "^0.22.1",
     "@vitest/ui": "^0.22.1",
-    "chalk": "^5.0.1",
+    "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
     "dotenv": "^16.0.1",
     "expect-more-jest": "^5.4.1",
@@ -48,8 +48,7 @@
   },
   "scripts": {
     "develop": "tsc -w",
-    "build": "tsc",
-    "postinstall": "tsc"
+    "build": "tsc"
   },
   "license": "MIT"
 }
