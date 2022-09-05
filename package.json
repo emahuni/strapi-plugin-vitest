@@ -11,6 +11,8 @@
     "strapi-plugin-vitest-init": "bin/vitest-init"
   },
   "devDependencies": {
+    "@strapi/strapi": "^4.3.6",
+    "@strapi/typescript-utils": "^4.3.6",
     "@types/node": "^18.7.14",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
@@ -43,7 +45,8 @@
   },
   "scripts": {
     "develop": "tsc -w",
-    "build": "tsc"
+    "build": "tsc",
+    "build:w": "tsc -w"
   },
   "license": "MIT"
 }

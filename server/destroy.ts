@@ -1,12 +1,12 @@
 import type { Strapi } from '@strapi/strapi';
 
-import pluginId from '../admin/src/pluginId';
+import { uid } from '../pluginId';
 import chalk from 'chalk';
 
 export default async ({ strapi }: { strapi: Strapi }) => {
-  strapi.log.info(chalk`{dim [destroy/()]-6:} destroying ${pluginId}...`);
+  strapi.log.info(chalk`{dim [destroy/()]-6:} destroying ${uid}...`);
   if (process.env.NODE_ENV === 'test') {
-    if (strapi.plugins[pluginId].config('cleanDBAtDestroy')) {
+    if (strapi.plugins[uid].config('cleanDBAtDestroy')) {
       await strapi.services['plugin::vitest.utils'].cleanDB();
     }
   }
