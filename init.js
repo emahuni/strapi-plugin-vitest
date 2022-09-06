@@ -2,14 +2,16 @@ const fse = require('fs-extra');
 const { resolve } = require('path');
 const paths = require('./paths.js');
 
+const pkg = JSON.parse(fse.readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
+
 
 function log (str) {
-  console.log('🧪 [strapi-plugin-vitest]: ' + str);
+  console.log(`🧪 [${pkg.name}]: ${str}`);
 }
 
 
 function log_err (str) {
-  console.error('❌ [strapi-plugin-vitest]: ' + str);
+  console.error(`❌ [${pkg.name}]: ${str}`);
 }
 
 
@@ -65,15 +67,15 @@ async function initTestHarness () {
       paths.TEST_ENV_DB_CONFIG_FILE,
   );
   
-  const pkg = JSON.parse(fse.readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
-  const peers = Object.entries(pkg.devDependencies).map(p => p[0] + '@' + p[1]);
+  const peers = Object.entries(pkg.peerDependencies).map(p => p[0] + '@' + p[1]);
   
-  log(`Please add the following packages to your project's devDependencies (you can remove the ones you don't want later, but you should be sure you edit the harness - "./tests/helpers" where the packages are used):\n`);
-  console.info('%o',peers.join(' '));
+  console.info('\n')
+  log(`Please add the following packages to your project's devDependencies if you received any messages about missing peerDependencies. If you use pnpm, configure it to "auto-install-peers",  or npm 7+ and you won't need to do this manually. You can remove the ones you don't want later, but you should be sure you edit the harness - "./tests/helpers" where the packages are used:\n`);
+  console.info('%o', peers.join(' '));
 }
 
 
 initTestHarness().then(() => {
   console.log('\n');
-  log('✨Done initializing test harness 🚀, read & finish minor required config before use.');
+  log(`✨Done initializing ${pkg.name} harness 🚀, read & finish minor required config before use.`);
 });
