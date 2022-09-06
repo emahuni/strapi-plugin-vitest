@@ -11,8 +11,6 @@
     "strapi-plugin-vitest-init": "bin/vitest-init"
   },
   "peerDependencies": {
-    "@strapi/strapi": "^4.3.6",
-    "@strapi/typescript-utils": "^4.3.6",
     "@types/node": "^18.7.14",
     "chalk": "^4.1.2",
     "chokidar": "^3.5.3",
@@ -22,9 +20,13 @@
     "override.env": "^1.0.2",
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
-    "typescript": "4.6.3",
     "vitest": "^0.22.1",
     "yargs": "^17.5.1"
+  },
+  "devDependencies": {
+    "@strapi/strapi": "^4.3.6",
+    "@strapi/typescript-utils": "^4.3.6",
+    "typescript": "^4.8.2"
   },
   "author": {
     "name": "Emmanuel Mahuni",
