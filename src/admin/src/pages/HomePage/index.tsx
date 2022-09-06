@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import pluginId from '../../pluginId';
+import { id as pluginId } from '../../../../../pluginId';
 
 const HomePage: React.VoidFunctionComponent = () => {
   return (
