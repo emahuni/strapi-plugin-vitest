@@ -4,20 +4,19 @@
     "outDir": "dist",
     "rootDir": "src",
     /* Disable emitting files if any type checking errors are reported. */
-    "noEmitOnError": false
+    "noEmitOnError": false,
+    "jsx": "react"
   },
   "include": [
     // Include the root directory
     "src/server",
     // Force the JSON files in the src folder to be included
     "src/**/*.json",
-    "admin/src",
+    "src/admin/src"
   ],
   "exclude": [
     "node_modules/",
     "dist/",
-    // Do not include admin files in the server compilation
-    "admin/",
     // Do not include test files
     "**/*.test.ts"
   ]
