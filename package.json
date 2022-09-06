@@ -49,7 +49,7 @@
     "develop": "tsc -w",
     "build": "rm -rfv dist && tsc",
     "build:w": "tsc -w",
-    "prepack": "rm -rfv dist && tsc"
+    "prepack": "rm -rfv dist; rm -fv tsconfig.tsbuildinfo && tsc"
   },
   "license": "MIT"
 }
