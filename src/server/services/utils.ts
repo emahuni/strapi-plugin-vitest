@@ -1,7 +1,6 @@
 import fs from 'fs';
-
 import type { Strapi } from '@strapi/strapi';
-import pluginId from '../../admin/src/pluginId';
+import { name as pluginId } from '../../../pluginId';
 
 export default function ({ strapi }: { strapi: Strapi }) {
   return {
