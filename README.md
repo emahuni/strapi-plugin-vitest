@@ -2,6 +2,7 @@
 
 Strapi plugin creates a Vitest unit testing harness, that loads Strapi in `strapi develop` allowing you to watch for changes and run tests from separate tests files without reloading the singlton. You don't have to require your tests from the `app.test.js` file, each test file is independent of others.
 
+> Plugin still < v1.0.0, implementations may change.
 
 ### Details
 
@@ -102,11 +103,19 @@ See example test file `app.test.js`, you can generate other test files like that
 
 #### Tests just quit with exist code 1
 - If tests quits with exit code 1, then ensure that sqlite is installed. Check package.json has sqlite3 installed. If not, do `yarn add -D sqlite3`
-- To see why it is failing, if no real followable error is showing, run `NODE_ENV=test yarn strapi dev`, that will run in development mode as usual, but with test environment. Any errors being swallowed up by test suite will show up.
+- To see why it is failing, if no real followable error is showing, run `NODE_ENV=test yarn strapi start`, that will run Strapi in development mode as usual, but within the test environment. Any errors being swallowed up by test suite will be thrown.
 
 #### Watcher is not working
 For some reason the vitest watcher is not working with Strapi. Therefore, I have devised a watcher to use with this plugin.
 - add `"vitest:w": "node ./tests/helpers/vitest-watch.js",` to you package.json scripts and use it to run under watch mode. Pass other Vitest options as usual.
+
+
+### Noteworthy Changes
+
+#### v0.2.0
+- Harness has a few fixes, therefore you need to run `strapi-plugin-vitest-init` to get the latest version of the harness. Before you do, rename `vitest-config.js` to `vitest-config.bck.js`, if you have any changes, move them into the new `vitest-config.js`.
+- Once you reinit harness, note that it is now in `tests/helpers/harness` from `tests/helpers`. If you have any customizations in the old harness files, then you have to manually move any customizations into the new files before you delete the old files.
+
 
 ## Author
 
