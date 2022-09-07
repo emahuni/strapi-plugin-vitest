@@ -20,7 +20,7 @@ const APP_TEST_PATH = resolve(TEST_DIR_PATH, 'app.test.ts');
 const PLUGIN_HARNESS_PATH = resolve(PLUGIN_HARNESS_TESTS_PATH, 'helpers/harness');
 const PLUGIN_HARNESS_APP_TESTS_PATH = resolve(PLUGIN_HARNESS_TESTS_PATH, 'app.test.ts');
 
-const TEST_APP_DIR_PATH = resolve(TEST_DIR_HARNESS_PATH, 'test-app');
+const TEST_APP_DIR = resolve(TEST_DIR_HARNESS_PATH, 'test-app');
 const PLUGIN_HARNESS_TEST_APP_DIR = resolve(PLUGIN_HARNESS_TESTS_PATH, 'helpers/test-app');
 
 module.exports = {
@@ -32,7 +32,7 @@ module.exports = {
   VITEST_CONFIG_FILE,
   TEST_DIR_HARNESS_PATH,
   APP_TEST_PATH,
-  TEST_APP_DIR_PATH,
+  TEST_APP_DIR,
   
   PLUGIN_HARNESS_TESTS_PATH,
   PLUGIN_HARNESS_DB_CONFIG_FILE,
