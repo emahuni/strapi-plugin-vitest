@@ -18,6 +18,8 @@ const HARNESS_PATH = resolve(HARNESS_TESTS_PATH, 'helpers/harness');
 const HARNESS_APP_TESTS_PATH = resolve(HARNESS_TESTS_PATH, 'app.test.ts');
 const APP_TEST_PATH = resolve(TEST_DIR_PATH, 'app.test.ts');
 
+const TEST_APP_DIR_PATH = resolve(TEST_DIR_HARNESS_PATH, 'test-app');
+
 module.exports = {
   PWD, isTS,
   TEST_ENV_DB_CONFIG_DIR,
@@ -32,4 +34,5 @@ module.exports = {
   HARNESS_PATH,
   HARNESS_APP_TESTS_PATH,
   APP_TEST_PATH,
+  TEST_APP_DIR_PATH
 };

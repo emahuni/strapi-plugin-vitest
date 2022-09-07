@@ -1,0 +1,31 @@
+{
+  "name": "test-app",
+  "version": "0.1.0",
+  "description": "A Testing Strapi application",
+  "scripts": {
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "build": "strapi build",
+    "strapi": "strapi"
+  },
+  "author": {
+    "name": "Emmanuel Mahuni",
+    "url": "https://github.com/emahuni/strapi-plugin-vitest",
+    "email": "emahuni@gmail.com"
+  },
+  "strapi": {
+    "uuid": "bfeb3372-9049-4b17-ac62-c5892826ab7e"
+  },
+  "devDependencies": {
+    "@strapi/strapi": "^4.3.6",
+    "@strapi/typescript-utils": "^4.3.6",
+    "@strapi/plugin-users-permissions": "^4.3.6",
+    "@strapi/plugin-i18n": "^4.3.6",
+    "better-sqlite3": "^7.4.6"
+  },
+  "engines": {
+    "node": ">=14.19.1 <=16.x.x",
+    "pnpm": ">=7.11.0 <=7.x.x"
+  },
+  "license": "MIT"
+}
