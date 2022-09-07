@@ -1,3 +1,4 @@
+import type { Strapi } from '@strapi/strapi';
 import { beforeAll, afterAll, it, expect, describe } from 'vitest';
 
 describe('Test the db', () => {

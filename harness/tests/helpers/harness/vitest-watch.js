@@ -38,7 +38,7 @@ for (const k in argv) {
 }
 console.debug(`[vitest-watch/()]-62: runMode: %o, args: %o`, runMode, args);
 
-const vitestConfig = require('../../vitest.config.js');
+const vitestConfig = require('../../../vitest.config.js');
 startWatching({
   // cwd:              process.env.PWD,
   command:  `yarn vitest ${runMode} ${args}`,

@@ -3,6 +3,7 @@ import envOverride from 'override.env';
 import { afterAll, beforeAll, Suite, File } from 'vitest';
 
 import StrapiStart from '@strapi/strapi/lib/commands/start';
+// @ts-ignore
 import { createSuperadminAccount } from './strapi-test-utils';
 import chalk from 'chalk';
 

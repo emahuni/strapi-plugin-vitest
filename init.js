@@ -40,12 +40,12 @@ async function checkIfExistsAndCopy (checkIfThisExists, sourcePath, targetPath) 
 
 
 async function initTestHarness () {
-  log(`Copying & overwritting testing harness helpers: \n\t-to: ${paths.TEST_DIR_HELPERS_PATH}\n`);
-  await fse.copy(paths.TEST_HARNESS_HELPERS_PATH, paths.TEST_DIR_HELPERS_PATH);
+  log(`Copying & overwriting testing harness helpers: \n\t-to: ${paths.TEST_DIR_HARNESS_PATH}\n`);
+  await fse.copy(paths.HARNESS_PATH, paths.TEST_DIR_HARNESS_PATH);
   
   await checkIfExistsAndCopy(
       paths.APP_TEST_PATH,
-      paths.APP_TEST_HARNESS_PATH,
+      paths.HARNESS_APP_TESTS_PATH,
       paths.APP_TEST_PATH,
   );
   
@@ -57,13 +57,13 @@ async function initTestHarness () {
   
   await checkIfExistsAndCopy(
       paths.VITEST_CONFIG_FILE,
-      paths.TEST_HARNESS_VITEST_CONFIG_FILE,
+      paths.HARNESS_VITEST_CONFIG_FILE,
       paths.VITEST_CONFIG_FILE,
   );
   
   await checkIfExistsAndCopy(
       paths.TEST_ENV_DB_CONFIG_FILE,
-      paths.TEST_HARNESS_DB_CONFIG_FILE,
+      paths.HARNESS_DB_CONFIG_FILE,
       paths.TEST_ENV_DB_CONFIG_FILE,
   );
   
