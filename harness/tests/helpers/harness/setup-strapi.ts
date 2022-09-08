@@ -43,7 +43,7 @@ beforeAll(async (ctx) => {
     console.debug(`[setup-strapi]: CWD: %o`, process.cwd());
     
     if(!existsSync(resolve(process.cwd(), 'dist'))) {
-      console.debug(`[setup-strapi]: Building "test-app" admin (done only once, if you change the test-app, remember to build this test-app)...`);
+      console.info(`[setup-strapi]: Missing "dist" dir, building "test-app" (if you change the test-app, just delete the "test-app/dist" dir, it will rebuild again)...`);
       await StrapiBuild({});
     }
 
