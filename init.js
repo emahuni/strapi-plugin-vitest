@@ -3,6 +3,7 @@ const { resolve } = require('path');
 const paths = require('./paths.js');
 
 const pkg = JSON.parse(fse.readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
+const prjPkg = JSON.parse(fse.readFileSync(resolve(paths.PWD, './package.json'), { encoding: 'utf8' }));
 const SERIAL = Date.now();
 
 
@@ -92,7 +93,7 @@ async function initTestHarness () {
       paths.TEST_DIR_HARNESS_PATH,
   );
   
-  if (pkg?.strapi?.kind === 'plugin') {
+  if (prjPkg?.strapi?.kind === 'plugin') {
     console.info('\n');
     await renameIfExistsAndCopy(
         paths.PLUGIN_HARNESS_TEST_APP_DIR,
