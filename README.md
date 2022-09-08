@@ -1,6 +1,6 @@
 # Strapi plugin Vitest
 
-Strapi plugin creates a Vitest unit testing harness, that loads Strapi in `strapi develop` allowing you to watch for changes and run tests from separate tests files without reloading the singlton. You don't have to require your tests from the `app.test.js` file, each test file is independent of others.
+> Strapi plugin creates a Vitest unit testing harness, that can be used to test Strapi apps and standalone plugins. It loads Strapi as a singleton that can be used by multiple test files. You don't have to require your tests from the `app.test.js` file, each test file is independent of others. It can be also used in watch mode.
 
 > Plugin still < v1.0.0, implementations may change.
 
@@ -14,7 +14,15 @@ Vitest works with Jest and Chai assertions and is very, very fast with little si
 The way this harness is made allows for Strapi to run a singleton that can be used by various files without reloading it each time
 for each file; it loads Strapi once, and you just write tests that work in separate isolated files.
 
+In addition to testing Strapi applications, it can also be used to test standalone plugins. It has a mini-strapi app that is exposed when you install and initialize it into a plugin project. You can then customize the mini-app in `tests/helpers/harness/test-app` however you need for the plugin tests to work properly.
+
 ### Usage
+
+```sh
+pnpm add -D strapi-plugin-vitest
+```
+
+or
 
 ```sh
 yarn add -D strapi-plugin-vitest
@@ -35,14 +43,14 @@ yarn strapi-plugin-vitest-init
 ```
 
 This custom initialization script will: 
-- overwrite any existing harness files in `test/helpers` directory _(ones that it ships with)_ (so make sure you don't have any changes in there that you can't recover)
+- _**renames**_ any existing harness files/dirs in `test/helpers` directory _(ones that it ships with)_.
   This Test harness has added plugins: [expect-more-jest](https://www.npmjs.com/package/expect-more-jest), [jest-extended](https://www.npmjs.com/package/jest-extended), [sinon-chai](https://www.npmjs.com/package/sinon-chai)
   - uses `.env.test`  file to extend the `.env` file if available. This means you can fine-tune the environment for testing purposes, though it maybe for dev purposes as well. I use it to turn on or off certain plugins during testing for example.
-- creates a `app.test.ts` example file if missing 
-- creates a `vitest.config.js` file if missing 
-- creates a `config/env/test/database.(js|ts)` file if missing (review this file, you may not want its defaults. In addition, I have noticed sqlite has issues, you may want to use other DB).
+- _**renames**_ a `app.test.ts` example file if missing 
+- _**renames**_ a `vitest.config.js` file if missing 
+- _**creates**_ a `config/env/test/database.(js|ts)` file if missing
 
-> This command is meant to be run once to expose the testing harness. You can freely edit these files if you wish to customize the harness or add new features through extensions and plugins. However, note that when you run this command again, it will overwrite files as indicated above. You can use VCS to then reset | merge your previous customizations if you so run this command on existing customizations.
+> This command is meant to be run once to expose the testing harness, however, you can run it any time to get the fresh/updated harness, and it will back up any existing harness files. You can freely edit these files if you wish to customize the harness or add new features through extensions and plugins. You can migrate your previous customizations from backups it creates if you so run this command on existing customizations.
 
 
 #### `tsconfig.config` Modifications
@@ -62,7 +70,7 @@ Create or add the following into `tsconfig.json`:
 
 #### `plugins.js|ts` Modifications
 
-Don't forget to enable the plugin in your test plugins' configuration. This plugin also cleans the DB based on configuration during tests startup. We did this to allow you to review your tests data after a run, since you can run a single test.
+Don't forget to enable the plugin in your test plugins' configuration. This plugin also cleans the DB based on configuration during tests startup. This is done to allow you to review your tests data before/after each run, since you can run a single test.
 ```js
 module.exports = {
   vitest: {
@@ -85,36 +93,43 @@ yarn vitest
 
 See [Vitest](https://vitest.dev/) for more information about running tests, arguments and options.
 
-### Difference with Strapi Documentation Example
+### Difference with Strapi Unit Testing Guide Documentation
 
 As mentioned before, this harness allows you to run tests files independently of the `app.test.js` file unlike as documented. Meaning you can run a file directly, without worrying
 of how the singleton will mount. Everything will be done by this harness. Test files will NOT be treated as a **single test file**, which makes it easier and standard to test Strapi
-code. For example, you can run specific test that match title = `validate my-plugin`, without running other tests:
+code. For example, you can run specific test that match title = `validate my-service`, without running other tests:
 
 ```sh
-yarn test -t "my-plugin"
+yarn test -t "my-service"
 ```
 
-Read Vitest [filtering documentation](https://vitest.dev/guide/filtering.html) for more information.
+Read Vitest [filtering documentation](https://vitest.dev/guide/filtering.html) for more information on tests filtering.
 
 See example test file `app.test.js`, you can generate other test files like that and just run them as usual, without adding them to a main test file.
 
 ### Troubleshooting
 
 #### Tests just quit with exist code 1
-- If tests quits with exit code 1, then ensure that sqlite is installed. Check package.json has sqlite3 installed. If not, do `yarn add -D sqlite3`
-- To see why it is failing, if no real followable error is showing, run `NODE_ENV=test yarn strapi start`, that will run Strapi in development mode as usual, but within the test environment. Any errors being swallowed up by test suite will be thrown.
+- If tests quits with exit code 1, then ensure that sqlite3 is installed if you are using a SQLite database. Check package.json has sqlite3 installed. If not, do `yarn add -D better-sqlite3`
+- Sometimes it may not be clear why the harness is failing to start. To see why startup is failing, if no real followable error is showing, run `NODE_ENV=test pnpm/yarn/npm strapi start`, that will run Strapi as usual, but within the test environment. Any errors being swallowed up by test suite will be thrown.
 
-#### Watcher is not working
+#### Tests Watching
 For some reason the vitest watcher is not working with Strapi. Therefore, I have devised a watcher to use with this plugin.
-- add `"vitest:w": "node ./tests/helpers/vitest-watch.js",` to you package.json scripts and use it to run under watch mode. Pass other Vitest options as usual.
+- add `"vitest:w": "node ./tests/helpers/vitest-watch.js",` to your `package.json` scripts and use it to run under watch mode. Pass other Vitest options as usual.
 
 
 ### Noteworthy Changes
 
+#### v0.2.2
+
+- Harness has a few fixes, therefore you need to run `strapi-plugin-vitest-init` to get the latest version of the harness. You don't have to back up any files, it'll be done for you.
+- The new harness can now be used to test standalone plugins
+
+
 #### v0.2.0
+
 - Harness has a few fixes, therefore you need to run `strapi-plugin-vitest-init` to get the latest version of the harness. Before you do, rename `vitest-config.js` to `vitest-config.bck.js`, if you have any changes, move them into the new `vitest-config.js`.
-- Once you reinit harness, note that it is now in `tests/helpers/harness` from `tests/helpers`. If you have any customizations in the old harness files, then you have to manually move any customizations into the new files before you delete the old files.
+- Once you re-init harness, note that it is now in `tests/helpers/harness` from `tests/helpers`. If you have any customizations in the old harness files, then you have to manually move any customizations into the new files before you delete the old files.
 
 
 ## Author
