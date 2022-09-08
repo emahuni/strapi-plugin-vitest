@@ -3,15 +3,18 @@ const { resolve } = require('path');
 const paths = require('./paths.js');
 
 const pkg = JSON.parse(fse.readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
+const SERIAL = Date.now();
 
 
 function log (str, ...rest) {
   console.log(`🛠  [${pkg.name}]: ${str}`, ...rest);
 }
 
+
 function log_warn (str, ...rest) {
   console.warn(`⚠️  [${pkg.name}]: ${str}`, ...rest);
 }
+
 
 function log_err (str, ...rest) {
   console.error(`❌  [${pkg.name}]: ${str}`, ...rest);
@@ -49,7 +52,8 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
   }
   
   if (!!exists) {
-    const bck = targetPath + Date.now();
+    const i = targetPath.lastIndexOf('.');
+    const bck = ~i ? targetPath.substring(i, -1) + '.' + SERIAL + targetPath.substring(i) : targetPath + '.' + SERIAL;
     log(`%o exists, renaming to %o so you can migrate any customizations before deleting it...`, targetPath, bck);
     try {
       await fse.move(targetPath, bck);
@@ -117,8 +121,17 @@ async function initTestHarness () {
   const peers = Object.entries(pkg.peerDependencies).map(p => p[0] + '@' + p[1]);
   
   console.info('\n');
-  log_warn(`Please add the following packages to your project's devDependencies if you received any messages about missing peerDependencies.\nIf you use pnpm, configure it to "auto-install-peers", run "pnpm install" to install the peers and you won't need to do this manually.\nYou can remove the ones you don't want later, but you should be sure you edit the harness - "./tests/helpers" where the packages are used:\n`);
-  console.info('%o', peers.join(' '));
+  log_warn(`Please add the following packages to your project's %o if you received any messages about missing %o;
+  using "pnpm/yarn add -D" or "npm install -D" with the following packages appended to that command:
+  %o
+  
+         - If you use pnpm, configure it to %o, and you won't need
+           to add these packages manually.
+         - If you remove any from that list be sure to edit the harness
+           for the ones you remove in %o where the packages are used.
+         - Run your package manager installation command:
+           %o or %o or %o to install the peers.
+`, 'devDependencies', 'peerDependencies',peers.join(' '), 'auto-install-peers', 'pnpm install', 'yarn install', 'npm install', './tests/helpers');
 }
 
 
