@@ -104,6 +104,13 @@ async function initTestHarness () {
         paths.TEST_APP_DIR,
         false,
     );
+    
+    console.info('\n');
+    await copy(
+        paths.PLUGIN_HARNESS_PLUGIN_TESTS_PATH,
+        paths.APP_PLUGIN_TEST_PATH,
+        false,
+    );
   } else {
     console.info('\n');
     await copy(
@@ -111,14 +118,14 @@ async function initTestHarness () {
         paths.TEST_ENV_DB_CONFIG_FILE,
         true,
     );
+    
+    console.info('\n');
+    await copy(
+        paths.PLUGIN_HARNESS_APP_TESTS_PATH,
+        paths.APP_TEST_PATH,
+        false,
+    );
   }
-  
-  console.info('\n');
-  await copy(
-      paths.PLUGIN_HARNESS_APP_TESTS_PATH,
-      paths.APP_TEST_PATH,
-      false,
-  );
   
   console.info('\n');
   await copy(

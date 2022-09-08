@@ -6,7 +6,11 @@ import type { Strapi } from '@strapi/strapi';
 import { resolve } from 'path';
 import { readFileSync } from 'fs';
 
-export const projectPkg = JSON.parse(readFileSync(resolve(process.cwd(), './package.json'), { encoding: 'utf8' }));
+export const projectPkg = JSON.parse(readFileSync(resolve(__dirname,'../../../', './package.json'), { encoding: 'utf8' }));
+export const pluginName = projectPkg.name;
+export const pluginId = projectPkg.name.replace(/^(@[^-,.][\w,-]+\/|strapi-)plugin-/i, '');
+export const pluginUid = `plugin::${pluginId}`;
+
 
 export async function jwt (idOrEmail) {
   return strapi.plugins['users-permissions'].services.jwt.issue({
