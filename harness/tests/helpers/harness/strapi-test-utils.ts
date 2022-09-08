@@ -2,7 +2,11 @@
  * Returns valid JWT token for authenticated
  * @param {String | number} idOrEmail, either user id, or email
  */
-import { Strapi } from '@strapi/strapi';
+import type { Strapi } from '@strapi/strapi';
+import { resolve } from 'path';
+import { readFileSync } from 'fs';
+
+export const projectPkg = JSON.parse(readFileSync(resolve(process.cwd(), './package.json'), { encoding: 'utf8' }));
 
 export async function jwt (idOrEmail) {
   return strapi.plugins['users-permissions'].services.jwt.issue({
