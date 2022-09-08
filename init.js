@@ -92,11 +92,17 @@ async function initTestHarness () {
       paths.TEST_DIR_HARNESS_PATH,
   );
   
-  console.info('\n');
   if (pkg?.strapi?.kind === 'plugin') {
+    console.info('\n');
     await renameIfExistsAndCopy(
         paths.PLUGIN_HARNESS_TEST_APP_DIR,
         paths.TEST_APP_DIR,
+    );
+  } else {
+    console.info('\n');
+    await copyIfNotExists(
+        paths.PLUGIN_HARNESS_DB_CONFIG_FILE,
+        paths.TEST_ENV_DB_CONFIG_FILE,
     );
   }
   
@@ -110,12 +116,6 @@ async function initTestHarness () {
   await renameIfExistsAndCopy(
       paths.PLUGIN_HARNESS_VITEST_CONFIG_FILE,
       paths.VITEST_CONFIG_FILE,
-  );
-  
-  console.info('\n');
-  await copyIfNotExists(
-      paths.PLUGIN_HARNESS_DB_CONFIG_FILE,
-      paths.TEST_ENV_DB_CONFIG_FILE,
   );
   
   const peers = Object.entries(pkg.peerDependencies).map(p => p[0] + '@' + p[1]);
