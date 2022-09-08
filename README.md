@@ -4,7 +4,7 @@
 
 > Plugin still < v1.0.0, implementations may change.
 
-### Details
+## Details
 
 This plugin provides a Vitest testing harness to enable easier testing with Strapi. The major advantage here is that Vitest uses Vite and therefore takes advantage of modern js
 that includes running ESM|TS without any transpilation, which runs the test blazingly fast. Read about [Vitest](https://vitest.dev) & Vite to learn more.
@@ -16,7 +16,7 @@ for each file; it loads Strapi once, and you just write tests that work in separ
 
 In addition to testing Strapi applications, it can also be used to test standalone plugins. It has a mini-strapi app that is exposed when you install and initialize it into a plugin project. You can then customize the mini-app in `tests/helpers/harness/test-app` however you need for the plugin tests to work properly.
 
-### Usage
+## Usage
 
 ```sh
 pnpm add -D strapi-plugin-vitest
@@ -43,15 +43,16 @@ yarn strapi-plugin-vitest-init
 ```
 
 This custom initialization script will: 
-- _**renames**_ any existing harness files/dirs in `test/helpers` directory _(ones that it ships with)_.
+- _**creates/overwrites**_ any existing harness files/dirs in `test/helpers` directory _(ones that it ships with)_.
   This Test harness has added plugins: [expect-more-jest](https://www.npmjs.com/package/expect-more-jest), [jest-extended](https://www.npmjs.com/package/jest-extended), [sinon-chai](https://www.npmjs.com/package/sinon-chai)
   - uses `.env.test`  file to extend the `.env` file if available. This means you can fine-tune the environment for testing purposes, though it maybe for dev purposes as well. I use it to turn on or off certain plugins during testing for example.
-- _**renames**_ a `app.test.ts` example file if missing 
-- _**renames**_ a `vitest.config.js` file if missing 
+- _**creates/overwrites**_ `app.test.ts` example file 
+- _**creates/overwrites**_ `vitest.config.js` vitest configuration file 
 - _**creates**_ a `config/env/test/database.(js|ts)` file if missing
 
-> This command is meant to be run once to expose the testing harness, however, you can run it any time to get the fresh/updated harness, and it will back up any existing harness files. You can freely edit these files if you wish to customize the harness or add new features through extensions and plugins. You can migrate your previous customizations from backups it creates if you so run this command on existing customizations.
+> This command is meant to be run once to expose the testing harness. However, you can run it any time to get the fresh/updated harness, and it will overwrite any existing harness files (VCS is essential here). You can freely edit these files if you wish to customize the harness or add new features through extensions and plugins. You can migrate your previous customizations through VCS diffs if you so run this command on existing customizations.
 
+### Configuration
 
 #### `tsconfig.config` Modifications
 Create or add the following into `tsconfig.json`:
@@ -68,9 +69,14 @@ Create or add the following into `tsconfig.json`:
 }
 ```
 
-#### `plugins.js|ts` Modifications
+#### `plugins.js|ts` Configuration
 
-Don't forget to enable the plugin in your test plugins' configuration. This plugin also cleans the DB based on configuration during tests startup. This is done to allow you to review your tests data before/after each run, since you can run a single test.
+Don't forget to enable the plugin in your test plugins' configuration. 
+
+This plugin also cleans the DB based on configuration during tests startup/destroy.
+  - At Startup is meant to allow you to review your tests data after each run.
+  - At Destroy is meant to be used to just clean up the database after each run.
+
 ```js
 module.exports = {
   vitest: {
@@ -119,6 +125,11 @@ For some reason the vitest watcher is not working with Strapi. Therefore, I have
 
 
 ### Noteworthy Changes
+
+#### v0.2.5
+
+- Fixed usage of plugin by the test-app.
+- Reverted to earlier behaviour of overwriting existing harness files. Commit everything before running init. 
 
 #### v0.2.2
 

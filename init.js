@@ -22,16 +22,18 @@ function log_err (str, ...rest) {
 }
 
 
-async function copyIfNotExists (sourcePath, targetPath) {
+async function copy (sourcePath, targetPath, checkIfExists = true) {
   let exists;
-  try {
-    exists = await fse.pathExists(targetPath);
-  } catch (err) {
-    log_err(`Error checking if %o exists`, targetPath);
+  if (checkIfExists) {
+    try {
+      exists = await fse.pathExists(targetPath);
+    } catch (err) {
+      log_err(`Error checking if %o exists`, targetPath);
+    }
   }
-
-  if (!exists) {
-    log(`%o doesn't exists, adding...`, targetPath);
+  
+  if (!checkIfExists || !exists) {
+    if (checkIfExists) log(`%o doesn't exists, adding...`, targetPath);
     log(`Copying to: %o...`, targetPath);
     try {
       await fse.copy(sourcePath, targetPath);
@@ -51,7 +53,7 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
   } catch (err) {
     log_err(`Error checking if %o exists`, targetPath);
   }
-
+  
   if (!!exists) {
     const i = targetPath.lastIndexOf('.');
     const bck = ~i ? targetPath.substring(i, -1) + '.' + SERIAL + targetPath.substring(i) : targetPath + '.' + SERIAL;
@@ -62,7 +64,7 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
       log_err(err);
     }
   }
-
+  
   log(`Copying to: %o...`, targetPath);
   try {
     await fse.copy(sourcePath, targetPath);
@@ -80,48 +82,53 @@ async function initTestHarness () {
   } catch (err) {
     log_err(`Error checking if %o dir exists!`, paths.TEST_DIR_PATH);
   }
-
+  
   console.info('\n');
-  await renameIfExistsAndCopy(
+  await copy(
       paths.PLUGIN_HARNESS_PATH,
       paths.TEST_DIR_HARNESS_PATH,
+      false,
   );
-
+  
   if (prjPkg?.strapi?.kind === 'plugin') {
     console.info('\n');
-
+    
     try {
       await fse.ensureDir(paths.TEST_ENV_DB_CONFIG_DIR);
     } catch (err) {
       log_err(`Error checking if %o dir exists!`, paths.TEST_ENV_DB_CONFIG_DIR);
     }
-
-    await renameIfExistsAndCopy(
+    
+    await copy(
         paths.PLUGIN_HARNESS_TEST_APP_DIR,
         paths.TEST_APP_DIR,
+        false,
     );
   } else {
     console.info('\n');
-    await copyIfNotExists(
+    await copy(
         paths.PLUGIN_HARNESS_DB_CONFIG_FILE,
         paths.TEST_ENV_DB_CONFIG_FILE,
+        true,
     );
   }
-
+  
   console.info('\n');
-  await renameIfExistsAndCopy(
+  await copy(
       paths.PLUGIN_HARNESS_APP_TESTS_PATH,
       paths.APP_TEST_PATH,
+      false,
   );
-
+  
   console.info('\n');
-  await renameIfExistsAndCopy(
+  await copy(
       paths.PLUGIN_HARNESS_VITEST_CONFIG_FILE,
       paths.VITEST_CONFIG_FILE,
+      false,
   );
-
+  
   const peers = Object.entries(pkg.peerDependencies).map(p => p[0] + '@' + p[1]);
-
+  
   console.info('\n');
   log_warn(`Please add the following packages to your project's %o if you received any messages about missing %o;
   using "pnpm/yarn add -D" or "npm install -D" with the following packages appended to that command:
