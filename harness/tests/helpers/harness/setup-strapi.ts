@@ -2,10 +2,13 @@ import envOverride from 'override.env';
 
 import { afterAll, beforeAll, Suite, File } from 'vitest';
 
+import StrapiBuild from '@strapi/strapi/lib/commands/build';
 import StrapiStart from '@strapi/strapi/lib/commands/start';
 // @ts-ignore
 import { createSuperadminAccount } from './strapi-test-utils';
 import chalk = require('chalk');
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 
 declare global {
   namespace NodeJS {
@@ -37,7 +40,12 @@ beforeAll(async (ctx) => {
 
     envOverride('.env.test', 'test');
 
-    console.debug(`[setup-strapi]: current working directory: %o`, process.cwd());
+    console.debug(`[setup-strapi]: CWD: %o`, process.cwd());
+    
+    if(!existsSync(resolve(process.cwd(), 'dist'))) {
+      console.debug(`[setup-strapi]: Building "test-app" admin (done only once, if you change the test-app, remember to build this test-app)...`);
+      await StrapiBuild({});
+    }
 
     /**
      * strapi-plugin-vitest will drop all (non-SQLite DB) tables before Strapi uses it so that it starts on a blank slate
