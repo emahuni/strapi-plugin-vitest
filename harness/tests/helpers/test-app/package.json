@@ -16,7 +16,7 @@
   "strapi": {
     "uuid": "bfeb3372-9049-4b17-ac62-c5892826ab7e"
   },
-  "devDependencies": {
+  "dependencies": {
     "@strapi/strapi": "^4.3.6",
     "@strapi/typescript-utils": "^4.3.6",
     "@strapi/plugin-users-permissions": "^4.3.6",
