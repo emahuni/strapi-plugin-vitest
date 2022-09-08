@@ -131,7 +131,7 @@ async function initTestHarness () {
            for the ones you remove in %o where the packages are used.
          - Run your package manager installation command:
            %o or %o or %o to install the peers.
-`, 'devDependencies', 'peerDependencies',peers.join(' '), 'auto-install-peers', 'pnpm install', 'yarn install', 'npm install', './tests/helpers');
+`, 'devDependencies', 'peerDependencies', peers.join(' '), 'auto-install-peers', './tests/helpers', 'yarn install', 'npm install', 'pnpm install');
 }
 
 
