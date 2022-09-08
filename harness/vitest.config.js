@@ -23,7 +23,7 @@ module.exports = defineConfig({
       join(paths.TEST_DIR_HARNESS_PATH, 'setup-strapi.ts'),
     ],
     
-    exclude: ['**/strapi-plugin-vitest/harness/**', '**/node_modules/**', '**/dist/**', '**/cypress/**', '**/.{idea,git,cache,output,temp,vscode,tmp}/**'],
+    exclude: ['**/strapi-plugin-vitest/harness/**', '**/node_modules/**', '**/dist/**', '**/cypress/**', '**/.{idea,git,cache,output,temp,vscode,tmp}/**', 'tests/helpers/**'],
     
     forceRerunTriggers: ['**/dist/**', '**/build/**', '**/tests/**', '**/package.json/**', '**/vite.config.*/**', '**/vitest.config.*/**', '.env**', '**/src/**'],
     watchExclude:       ['**/node_modules/**', '**/.{idea,vscode,git,cache,output,temp,tmp}/**', '**/build/**'],
