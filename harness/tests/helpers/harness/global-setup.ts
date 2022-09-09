@@ -1,6 +1,7 @@
 import process from 'process';
 // @ts-ignore
-import { projectPkg } from './strapi-test-utils';
+import { info } from './strapi-test-utils';
+
 // @ts-ignore
 import paths = require('strapi-plugin-vitest/paths');
 
@@ -10,7 +11,7 @@ export async function setup () {
   
   
   // todo strapi should allow strapi start to accept an appDir, remove this logic when it's done
-  if (projectPkg?.strapi?.kind === 'plugin') {
+  if (info.projectPkg?.strapi?.kind === 'plugin') {
     // change to the cwd to the test app's dir so that the app boots up correctly
     // we have to do it here because this doesn't work in workers
     process.chdir(paths.TEST_APP_DIR);

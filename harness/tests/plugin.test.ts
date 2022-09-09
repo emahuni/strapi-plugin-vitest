@@ -1,9 +1,9 @@
 import type { Strapi } from '@strapi/strapi';
 import { beforeAll, afterAll, it, test, expect, describe } from 'vitest';
 // @ts-ignore
-import { pluginName, pluginId, pluginUid } from './helpers/harness/strapi-test-utils';
+import { info } from './helpers/harness/strapi-test-utils';
 
-describe(`# Plugin "${pluginName}"`, () => {
+describe(`# Plugin "${(info.pluginName)}"`, () => {
   /** this code is called once before all tests in this test file are called */
   beforeAll(async () => {
     //
@@ -19,8 +19,8 @@ describe(`# Plugin "${pluginName}"`, () => {
     expect(strapi).to.not.be.undefined;
   });
   
-  test(`"${pluginUid}" is defined and ready!`, () => {
-    expect(strapi.plugins[pluginId]).to.not.be.undefined;
+  test(`"${(info.pluginUid)}" is defined and ready!`, () => {
+    expect(strapi.plugins[info.pluginId]).to.not.be.undefined;
   });
 });
 

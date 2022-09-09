@@ -139,6 +139,8 @@ async function initTestHarness () {
   await fse.remove(resolve(paths.TEST_APP_DIR, '.cache')).catch(console.error);
   await fse.remove(resolve(paths.TEST_APP_DIR, 'node_modules')).catch(console.error);
 
+  // todo use modify-json-file to add useful package.json scripts and devDependencies
+  
   console.info('\n');
   log_warn(`Please add the following packages to your project's %o if you received any messages about missing %o;
   using "pnpm/yarn add -D" or "npm install -D" with the following packages appended to that command:

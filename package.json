@@ -11,10 +11,10 @@
     "strapi-plugin-vitest-init": "bin/vitest-init"
   },
   "peerDependencies": {
+    "@strapi/plugin-i18n": "^4.3.6",
+    "@strapi/plugin-users-permissions": "^4.3.6",
     "@strapi/strapi": "^4.3.6",
     "@strapi/typescript-utils": "^4.3.6",
-    "@strapi/plugin-users-permissions": "^4.3.6",
-    "@strapi/plugin-i18n": "^4.3.6",
     "@types/node": "^18.7.14",
     "better-sqlite3": "^7.4.6",
     "chalk": "^4.1.2",
@@ -26,6 +26,7 @@
     "sinon": "^14.0.0",
     "sinon-chai": "^3.7.0",
     "vitest": "^0.22.1",
+    "where-is": "^1.0.4",
     "yargs": "^17.5.1"
   },
   "devDependencies": {
