@@ -2,6 +2,8 @@ const chokidar = require('chokidar');
 const { spawn } = require('child_process');
 // noinspection NpmUsedModulesInstalled just use the one that ships with Strapi
 const debounce = require('lodash.debounce');
+// noinspection NpmUsedModulesInstalled
+const { packageManager } = require('strapi-plugin-vitest/dist/strapi-test-utils');
 
 const yargs = require('yargs/yargs');
 
@@ -39,9 +41,18 @@ for (const k in argv) {
 console.debug(`[vitest-watch/()]-62: runMode: %o, args: %o`, runMode, args);
 
 const vitestConfig = require('../../../vitest.config.js');
+let pm = packageManager();
+if (pm) {
+  console.info('\n');
+  console.info('Using %o package manager...', pm);
+} else {
+  console.warn(`Couldn't find lock file to determine package manager. Please run install to generate a lock file first. Using npm as a default.`);
+  pm = 'npm';
+}
+
 startWatching({
   // cwd:              process.env.CWD,
-  command:  `yarn vitest ${runMode} ${args}`,
+  command:  `${pm} vitest ${runMode} ${args}`,
   patterns: vitestConfig.test.forceRerunTriggers ?? '.',
   
   debounce: 400,
