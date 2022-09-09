@@ -2,7 +2,8 @@ const fse = require('fs-extra');
 const { resolve } = require('path');
 const paths = require('./paths.js');
 const { modifyPackageJsonFile } = require('modify-json-file');
-const where = require('where-is');
+// noinspection NpmUsedModulesInstalled
+const { packageManager } = require('./dist/strapi-test-utils');
 
 const pkg = JSON.parse(fse.readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
 const prjPkg = JSON.parse(fse.readFileSync(resolve(paths.CWD, './package.json'), { encoding: 'utf8' }));
@@ -85,7 +86,6 @@ async function initTestHarness () {
     log_err(`Error checking if %o dir exists!`, paths.TEST_DIR_PATH);
   }
   
-  console.info('\n');
   await copy(
       paths.PLUGIN_HARNESS_PATH,
       paths.TEST_DIR_HARNESS_PATH,
@@ -93,14 +93,12 @@ async function initTestHarness () {
   );
   
   if (prjPkg?.strapi?.kind === 'plugin') {
-    console.info('\n');
     await copy(
         paths.PLUGIN_HARNESS_TEST_APP_DIR,
         paths.TEST_APP_DIR,
         false,
     );
     
-    console.info('\n');
     await copy(
         paths.PLUGIN_HARNESS_PLUGIN_TESTS_PATH,
         paths.APP_PLUGIN_TEST_PATH,
@@ -113,14 +111,12 @@ async function initTestHarness () {
       log_err(`Error checking if %o dir exists!`, paths.TEST_ENV_DB_CONFIG_DIR);
     }
     
-    console.info('\n');
     await copy(
         paths.PLUGIN_HARNESS_DB_CONFIG_FILE,
         paths.TEST_ENV_DB_CONFIG_FILE,
         true,
     );
     
-    console.info('\n');
     await copy(
         paths.PLUGIN_HARNESS_APP_TESTS_PATH,
         paths.APP_TEST_PATH,
@@ -128,7 +124,6 @@ async function initTestHarness () {
     );
   }
   
-  console.info('\n');
   await copy(
       paths.PLUGIN_HARNESS_VITEST_CONFIG_FILE,
       paths.VITEST_CONFIG_FILE,
@@ -141,27 +136,7 @@ async function initTestHarness () {
   await fse.remove(resolve(paths.TEST_APP_DIR, '.cache')).catch(console.error);
   await fse.remove(resolve(paths.TEST_APP_DIR, 'node_modules')).catch(console.error);
   
-  let pm, isPnpm, isYarn, isNpm;
-  let cwd = paths.CWD;
-  do {
-    // todo what about .pnp
-    cwd = where('node_modules', cwd);
-    if (!cwd) break;
-    
-    // console.debug(`[strapi-test-utils/packageRootPath()]-17: where is package.json -> path: %o`, path);
-    if (await fse.exists(resolve(cwd, './pnpm-lock.yaml'))) {
-      pm = 'pnpm';
-      isPnpm = true;
-    } else if (await fse.exists(resolve(cwd, './yarn-lock.json'))) {
-      pm = 'yarn';
-      isYarn = true;
-    } else if (await fse.exists(resolve(cwd, './yarn-lock.json'))) {
-      pm = 'npm';
-      isNpm = true;
-    }
-    
-    if (!pm) cwd = resolve(cwd, '..'); // step 1 dir back since we didn't find a lock file
-  } while (!pm);
+  let pm = packageManager();
   
   if (pm) {
     console.info('\n')
@@ -190,16 +165,13 @@ async function initTestHarness () {
     },
   });
   
-  console.info('\n');
   if (pm === 'pnpm') {
     log_warn(`Please run the following to add packages to your project's %o if you received any messages about missing %o; or configure pnpm to %o to skip the following manual installation.\n\n%o\n`, 'devDependencies', 'peerDependencies', 'auto-install-peers', `pnpm add -D ${peers.join(' ')}`);
   } else {
     log_warn(`Please add the following packages to your project's %o (if you received any messages about missing %o); using:\n\n%o \n`, 'devDependencies', 'peerDependencies', pm === 'npm' ? 'yarn add -D ' + peers.join(' ') : 'npm install -D ' + peers.join(' '));
   }
   
-  console.info(`
-   - If you remove any package from that list be sure to edit the harness, for the ones you remove in %o, where the packages are used.
-     `, './tests/helpers/harness');
+  console.info(`   - If you remove any package from that list be sure to edit the harness, for the ones you remove in %o, where the packages are used.`, './tests/helpers/harness');
 }
 
 
