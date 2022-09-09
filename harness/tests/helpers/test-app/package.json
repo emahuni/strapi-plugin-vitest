@@ -14,6 +14,7 @@
     "email": "emahuni@gmail.com"
   },
   "strapi": {
+    "isTestApp": true,
     "uuid": "bfeb3372-9049-4b17-ac62-c5892826ab7e"
   },
   "dependencies": {
