@@ -92,13 +92,6 @@ async function initTestHarness () {
 
   if (prjPkg?.strapi?.kind === 'plugin') {
     console.info('\n');
-
-    try {
-      await fse.ensureDir(paths.TEST_ENV_DB_CONFIG_DIR);
-    } catch (err) {
-      log_err(`Error checking if %o dir exists!`, paths.TEST_ENV_DB_CONFIG_DIR);
-    }
-
     await copy(
         paths.PLUGIN_HARNESS_TEST_APP_DIR,
         paths.TEST_APP_DIR,
@@ -112,6 +105,12 @@ async function initTestHarness () {
         false,
     );
   } else {
+    try {
+      await fse.ensureDir(paths.TEST_ENV_DB_CONFIG_DIR);
+    } catch (err) {
+      log_err(`Error checking if %o dir exists!`, paths.TEST_ENV_DB_CONFIG_DIR);
+    }
+
     console.info('\n');
     await copy(
         paths.PLUGIN_HARNESS_DB_CONFIG_FILE,
