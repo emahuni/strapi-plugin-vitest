@@ -6,10 +6,29 @@ import type { Strapi } from '@strapi/strapi';
 import { resolve } from 'path';
 import { readFileSync } from 'fs';
 
-export const projectPkg = JSON.parse(readFileSync(resolve(__dirname,'../../../', './package.json'), { encoding: 'utf8' }));
-export const pluginName = projectPkg.name;
-export const pluginId = projectPkg.name.replace(/^(@[^-,.][\w,-]+\/|strapi-)plugin-/i, '');
-export const pluginUid = `plugin::${pluginId}`;
+// reliable way to get to a file, especially when using workspaces & pnp modules
+import where from 'where-is';
+
+export const info = {
+  get packageRootPath () {
+    let path, cwd = process.cwd();
+    do {
+      path = where('package.json', cwd);
+      // console.debug(`[strapi-test-utils/packageRootPath()]-17: where is package.json -> path: %o`, path);
+      cwd = resolve(cwd, '..'); // step 1 dir back in case we are in test-app directory
+    } while (path.includes('test-app')); // just make sure that this is not the test-app package.json's path
+
+    if(!path) throw new Error("Couldn't find package.json that doesn't belong to test-app package.");
+
+    return path;
+  },
+  get projectPkg () {
+    return JSON.parse(readFileSync(resolve(this.packageRootPath, 'package.json'), { encoding: 'utf8' }));
+  },
+  get pluginName () { return this.projectPkg.name; },
+  get pluginId () { return this.pluginName.replace(/^(@.*|strapi-)plugin-/i, ''); },
+  get pluginUid () { return `plugin::${this.pluginId}`; },
+};
 
 
 export async function jwt (idOrEmail) {
@@ -36,7 +55,7 @@ export async function grantPrivilege (
   const updateObj = value
       .split('.')
       .reduceRight((obj, next) => ({ [next]: obj }), { enabled, policy });
-  
+
   return await strapi.plugins[
       'users-permissions'
       ].services.userspermissions.updateRole(roleID, updateObj);
@@ -69,10 +88,10 @@ export async function updatePluginStore (
     type:        'plugin',
     name:        pluginName,
   });
-  
+
   const oldValues = await pluginStore.get({ key });
   const newValue = Object.assign({}, oldValues, newValues);
-  
+
   return pluginStore.set({ key: key, value: newValue });
 }
 
@@ -89,7 +108,7 @@ export function getPluginStore (pluginName, key, environment = '') {
     type:        'plugin',
     name:        pluginName,
   });
-  
+
   return pluginStore.get({ key });
 }
 
@@ -141,7 +160,7 @@ export async function createSuperadminAccount (strapi: Strapi, opts: { email?: s
         'Cannot register the first admin because the super admin role doesn\'t exist.',
     );
   }
-  
+
   // @ts-expect-error type
   const user = await strapi.admin.services.user.create({
     email:             opts.email,
@@ -152,7 +171,7 @@ export async function createSuperadminAccount (strapi: Strapi, opts: { email?: s
     isActive:          true,
     roles:             superAdminRole ? [superAdminRole.id] : [],
   });
-  
+
   // @ts-expect-error type
   strapi.superadmin = {
     // @ts-expect-error type
@@ -160,7 +179,7 @@ export async function createSuperadminAccount (strapi: Strapi, opts: { email?: s
     // @ts-expect-error type
     user: strapi.admin.services.user.sanitizeUser(user),
   };
-  
+
   // @ts-expect-error type
   return strapi.superadmin;
 }
