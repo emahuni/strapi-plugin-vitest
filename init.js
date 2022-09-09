@@ -5,7 +5,7 @@ const { modifyPackageJsonFile } = require('modify-json-file');
 const where = require('where-is');
 
 const pkg = JSON.parse(fse.readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
-const prjPkg = JSON.parse(fse.readFileSync(resolve(paths.PWD, './package.json'), { encoding: 'utf8' }));
+const prjPkg = JSON.parse(fse.readFileSync(resolve(paths.CWD, './package.json'), { encoding: 'utf8' }));
 const SERIAL = Date.now();
 
 
@@ -142,7 +142,7 @@ async function initTestHarness () {
   await fse.remove(resolve(paths.TEST_APP_DIR, 'node_modules')).catch(console.error);
   
   let pm, isPnpm, isYarn, isNpm;
-  let cwd = paths.PWD;
+  let cwd = paths.CWD;
   do {
     // todo what about .pnp
     cwd = where('node_modules', cwd);
@@ -182,10 +182,10 @@ async function initTestHarness () {
       s['vitest:w'] = 'node ./tests/helpers/harness/vitest-watch.js';
       s['vitest:init'] = 'strapi-plugin-vitest-init';
       // test-app: is to make sure we are invoking the correct app
-      s['vitest:test-app:clean'] = `cd ${resolve(paths.PWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
-      s['vitest:test-app:develop'] = `cd ${resolve(paths.PWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
-      s['vitest:test-app:start'] = `cd ${resolve(paths.PWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:start`;
-      s['vitest:test-app:console'] = `cd ${resolve(paths.PWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
+      s['vitest:test-app:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
+      s['vitest:test-app:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
+      s['vitest:test-app:start'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:start`;
+      s['vitest:test-app:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
       return s;
     },
   });
