@@ -1,6 +1,8 @@
 const fse = require('fs-extra');
 const { resolve } = require('path');
 const paths = require('./paths.js');
+const { modifyPackageJsonFile } = require('modify-json-file');
+const where = require('where-is');
 
 const pkg = JSON.parse(fse.readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
 const prjPkg = JSON.parse(fse.readFileSync(resolve(paths.PWD, './package.json'), { encoding: 'utf8' }));
@@ -31,7 +33,7 @@ async function copy (sourcePath, targetPath, checkIfExists = true) {
       log_err(`Error checking if %o exists`, targetPath);
     }
   }
-
+  
   if (!checkIfExists || !exists) {
     if (checkIfExists) log(`%o doesn't exists, adding...`, targetPath);
     log(`Copying to: %o...`, targetPath);
@@ -53,7 +55,7 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
   } catch (err) {
     log_err(`Error checking if %o exists`, targetPath);
   }
-
+  
   if (!!exists) {
     const i = targetPath.lastIndexOf('.');
     const bck = ~i ? targetPath.substring(i, -1) + '.' + SERIAL + targetPath.substring(i) : targetPath + '.' + SERIAL;
@@ -64,7 +66,7 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
       log_err(err);
     }
   }
-
+  
   log(`Copying to: %o...`, targetPath);
   try {
     await fse.copy(sourcePath, targetPath);
@@ -82,14 +84,14 @@ async function initTestHarness () {
   } catch (err) {
     log_err(`Error checking if %o dir exists!`, paths.TEST_DIR_PATH);
   }
-
+  
   console.info('\n');
   await copy(
       paths.PLUGIN_HARNESS_PATH,
       paths.TEST_DIR_HARNESS_PATH,
       false,
   );
-
+  
   if (prjPkg?.strapi?.kind === 'plugin') {
     console.info('\n');
     await copy(
@@ -97,7 +99,7 @@ async function initTestHarness () {
         paths.TEST_APP_DIR,
         false,
     );
-
+    
     console.info('\n');
     await copy(
         paths.PLUGIN_HARNESS_PLUGIN_TESTS_PATH,
@@ -110,14 +112,14 @@ async function initTestHarness () {
     } catch (err) {
       log_err(`Error checking if %o dir exists!`, paths.TEST_ENV_DB_CONFIG_DIR);
     }
-
+    
     console.info('\n');
     await copy(
         paths.PLUGIN_HARNESS_DB_CONFIG_FILE,
         paths.TEST_ENV_DB_CONFIG_FILE,
         true,
     );
-
+    
     console.info('\n');
     await copy(
         paths.PLUGIN_HARNESS_APP_TESTS_PATH,
@@ -125,34 +127,79 @@ async function initTestHarness () {
         false,
     );
   }
-
+  
   console.info('\n');
   await copy(
       paths.PLUGIN_HARNESS_VITEST_CONFIG_FILE,
       paths.VITEST_CONFIG_FILE,
       false,
   );
-
+  
   const peers = Object.entries(pkg.peerDependencies).map(p => p[0] + '@' + p[1]);
-
+  
   await fse.remove(resolve(paths.TEST_APP_DIR, 'dist')).catch(console.error);
   await fse.remove(resolve(paths.TEST_APP_DIR, '.cache')).catch(console.error);
   await fse.remove(resolve(paths.TEST_APP_DIR, 'node_modules')).catch(console.error);
-
-  // todo use modify-json-file to add useful package.json scripts and devDependencies
+  
+  let pm, isPnpm, isYarn, isNpm;
+  let cwd = paths.PWD;
+  do {
+    // todo what about .pnp
+    cwd = where('node_modules', cwd);
+    if (!cwd) break;
+    
+    // console.debug(`[strapi-test-utils/packageRootPath()]-17: where is package.json -> path: %o`, path);
+    if (await fse.exists(resolve(cwd, './pnpm-lock.yaml'))) {
+      pm = 'pnpm';
+      isPnpm = true;
+    } else if (await fse.exists(resolve(cwd, './yarn-lock.json'))) {
+      pm = 'yarn';
+      isYarn = true;
+    } else if (await fse.exists(resolve(cwd, './yarn-lock.json'))) {
+      pm = 'npm';
+      isNpm = true;
+    }
+    
+    if (!pm) cwd = resolve(cwd, '..'); // step 1 dir back since we didn't find a lock file
+  } while (!pm);
+  
+  if (pm) {
+    console.info('\n')
+    log('Using %o package manager...', pm);
+  } else {
+    log_warn(`Couldn't find lock file to determine package manager. Please run install to generate a lock file first. Using npm as a default.`);
+    pm = 'npm';
+  }
+  
+  await modifyPackageJsonFile('./package.json', {
+    // todo use modify-json-file to add useful package.json devDependencies
+    // devDependencies: d => {
+    //   console.log(d);
+    //   return d;
+    // },
+    scripts: s => {
+      s.test = 'vitest';
+      s['vitest:w'] = 'node ./tests/helpers/harness/vitest-watch.js';
+      s['vitest:init'] = 'strapi-plugin-vitest-init';
+      // test-app: is to make sure we are invoking the correct app
+      s['vitest:test-app:clean'] = `cd ${resolve(paths.PWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
+      s['vitest:test-app:develop'] = `cd ${resolve(paths.PWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
+      s['vitest:test-app:start'] = `cd ${resolve(paths.PWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:start`;
+      s['vitest:test-app:console'] = `cd ${resolve(paths.PWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
+      return s;
+    },
+  });
   
   console.info('\n');
-  log_warn(`Please add the following packages to your project's %o if you received any messages about missing %o;
-  using "pnpm/yarn add -D" or "npm install -D" with the following packages appended to that command:
-  %o
+  if (pm === 'pnpm') {
+    log_warn(`Please run the following to add packages to your project's %o if you received any messages about missing %o; or configure pnpm to %o to skip the following manual installation.\n\n%o\n`, 'devDependencies', 'peerDependencies', 'auto-install-peers', `pnpm add -D ${peers.join(' ')}`);
+  } else {
+    log_warn(`Please add the following packages to your project's %o (if you received any messages about missing %o); using:\n\n%o \n`, 'devDependencies', 'peerDependencies', pm === 'npm' ? 'yarn add -D ' + peers.join(' ') : 'npm install -D ' + peers.join(' '));
+  }
   
-         - If you use pnpm, configure it to %o, and you won't need
-           to add these packages manually.
-         - If you remove any from that list be sure to edit the harness
-           for the ones you remove in %o where the packages are used.
-         - Run your package manager installation command:
-           %o or %o or %o to install the peers.
-`, 'devDependencies', 'peerDependencies', peers.join(' '), 'auto-install-peers', './tests/helpers', 'yarn install', 'npm install', 'pnpm install');
+  console.info(`
+   - If you remove any package from that list be sure to edit the harness, for the ones you remove in %o, where the packages are used.
+     `, './tests/helpers/harness');
 }
 
 

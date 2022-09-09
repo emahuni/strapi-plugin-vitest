@@ -7,14 +7,12 @@
 ## Details
 
 This plugin provides a Vitest testing harness to enable easier testing with Strapi. The major advantage here is that Vitest uses Vite and therefore takes advantage of modern js
-that includes running ESM|TS without any transpilation, which runs the test blazingly fast. Read about [Vitest](https://vitest.dev) & Vite to learn more.
+that includes running ESM or TS without any transpilation. Read about [Vitest](https://vitest.dev) & Vite to learn more. Vitest works with Jest and Chai assertions and is very, very fast with little simple config needed to use it. 
 
-Vitest works with Jest and Chai assertions and is very, very fast with little simple config needed to use it. 
+The way this harness is made allows for Strapi to run a singleton that can be used by various test files without reloading it each time
+for each file; it loads Strapi once, and you just write tests that work in independent test files without appending them to `app.test.js`.
 
-The way this harness is made allows for Strapi to run a singleton that can be used by various files without reloading it each time
-for each file; it loads Strapi once, and you just write tests that work in separate isolated files.
-
-In addition to testing Strapi applications, it can also be used to test standalone plugins. It has a mini-strapi app that is exposed when you install and initialize it into a plugin project. You can then customize the mini-app in `tests/helpers/harness/test-app` however you need for the plugin tests to work properly.
+In addition to testing Strapi applications, it can also be used to test standalone plugins. It has a mini-strapi app that is exposed when you install and initialize it into a plugin project. The mini-app is started and has the root package (plugin) installed by default. You can then customize the mini-app  `tests/helpers/harness/test-app` for anything required by the plugin.
 
 ## Usage
 
@@ -22,35 +20,30 @@ In addition to testing Strapi applications, it can also be used to test standalo
 pnpm add -D strapi-plugin-vitest
 ```
 
-or
-
-```sh
-yarn add -D strapi-plugin-vitest
-```
-
-or
-
-```sh
-npm install -D strapi-plugin-vitest
-```
+Use your preferred package manager `yarn/pnpm/npm` where `pnpm` is mentioned.
 
 ### Initialization
 
-To initialize the harness, you need to run the supplied `bin` file:
+To initialize the harness, you need to run `pnpm strapi-plugin-vitest-init` 
 
-```sh
-yarn strapi-plugin-vitest-init
-```
+> This command is meant to be run once to expose the testing harness. However, you can run it any time to get the fresh/updated harness, and it will overwrite any existing harness files (VCS is essential here). You can freely edit these files if you wish to customize the harness or add new features through extensions and plugins. You can migrate your previous customizations through VCS diffs if you so run this command on existing customizations.
 
-This custom initialization script will: 
+
+The initialization script: 
 - _**creates/overwrites**_ any existing harness files/dirs in `test/helpers` directory _(ones that it ships with)_.
   This Test harness has added plugins: [expect-more-jest](https://www.npmjs.com/package/expect-more-jest), [jest-extended](https://www.npmjs.com/package/jest-extended), [sinon-chai](https://www.npmjs.com/package/sinon-chai)
   - uses `.env.test`  file to extend the `.env` file if available. This means you can fine-tune the environment for testing purposes, though it maybe for dev purposes as well. I use it to turn on or off certain plugins during testing for example.
 - _**creates/overwrites**_ `app.test.ts` example file 
-- _**creates/overwrites**_ `vitest.config.js` vitest configuration file 
+- _**creates/overwrites**_ `vitest.config.js` vitest configuration file
 - _**creates**_ a `config/env/test/database.(js|ts)` file if missing
-
-> This command is meant to be run once to expose the testing harness. However, you can run it any time to get the fresh/updated harness, and it will overwrite any existing harness files (VCS is essential here). You can freely edit these files if you wish to customize the harness or add new features through extensions and plugins. You can migrate your previous customizations through VCS diffs if you so run this command on existing customizations.
+- _**adds**_ the following scripts to your `package.json` assist with initialization, usage and other chores _(please review them to see if they use the correct preferred package manager)_:
+  - `vitest:init` - executes script to initialize the test harness.
+  - `vitest` - executes script to run vitest
+  - `vitest:w` - executes script to run vitest in watch mode (custom watcher)
+  - `vitest:test-app:clean` - executes script to clean test application build artifacts (only available with plugins)
+  - `vitest:test-app:develop` - executes script to run the test application in develop mode (only available with plugins)
+  - `vitest:test-app:start` - executes script to run the test application in start mode (only available with plugins)
+  - `vitest:test-app:console` - executes script to run the test application in console mode (only available with plugins)
 
 ### Configuration
 
@@ -74,7 +67,7 @@ Create or add the following into `tsconfig.json`:
 Don't forget to enable the plugin in your test plugins' configuration. 
 
 This plugin also cleans the DB based on configuration during tests startup/destroy.
-  - At Startup is meant to allow you to review your tests data after each run.
+  - At Register is meant to allow you to review your tests data after each run.
   - At Destroy is meant to be used to just clean up the database after each run.
 
 ```js
@@ -94,37 +87,43 @@ module.exports = {
 To run tests do the following:
 
 ```sh
-yarn vitest 
+pnpm vitest 
 ```
 
 See [Vitest](https://vitest.dev/) for more information about running tests, arguments and options.
 
 ### Difference with Strapi Unit Testing Guide Documentation
 
-As mentioned before, this harness allows you to run tests files independently of the `app.test.js` file unlike as documented. Meaning you can run a file directly, without worrying
-of how the singleton will mount. Everything will be done by this harness. Test files will NOT be treated as a **single test file**, which makes it easier and standard to test Strapi
-code. For example, you can run specific test that match title = `validate my-service`, without running other tests:
+As mentioned before, this harness allows you to run tests files independently of the `app.test.js` file unlike as documented (Strapi Team is free to add this to Strapi Documentation or to Strapi suite of packages). Meaning you can run a file directly, without worrying
+of how the singleton will mount. Everything will be done by this harness. Test files will NOT be treated as separate test files, which makes it easier and standard to test Strapi
+code. For example, you can run specific test that match title = `# validate my-service`, without running other tests:
 
 ```sh
-yarn test -t "my-service"
+pnpm test -t "my-service"
 ```
 
 Read Vitest [filtering documentation](https://vitest.dev/guide/filtering.html) for more information on tests filtering.
 
-See example test file `app.test.js`, you can generate other test files like that and just run them as usual, without adding them to a main test file.
+See example test file `app.test.js`, you can generate other test files like that and just run them as usual, without adding them to a main test file or worry about special treatment for test code.
 
 ### Troubleshooting
 
 #### Tests just quit with exist code 1
-- If tests quits with exit code 1, then ensure that sqlite3 is installed if you are using a SQLite database. Check package.json has sqlite3 installed. If not, do `yarn add -D better-sqlite3`
-- Sometimes it may not be clear why the harness is failing to start. To see why startup is failing, if no real followable error is showing, run `NODE_ENV=test pnpm/yarn/npm strapi start`, that will run Strapi as usual, but within the test environment. Any errors being swallowed up by test suite will be thrown.
+
+- If tests quits with exit code 1, then ensure that sqlite3 is installed if you are using a SQLite database. Check package.json has sqlite3 installed. If not, do `pnpm add -D better-sqlite3`
+- Sometimes it may not be clear why the harness is failing to start. To see why startup is failing, if no real followable error is showing, run `NODE_ENV=test pnpm strapi start` (when used to test applications) or `NODE_ENV=test pnpm vitest:test-app:start`, that will run Strapi as usual, but within a test environment. Any errors being swallowed up by test suite will be thrown.
 
 #### Tests Watching
-For some reason the vitest watcher is not working with Strapi. Therefore, I have devised a watcher to use with this plugin.
-- add `"vitest:w": "node ./tests/helpers/vitest-watch.js",` to your `package.json` scripts and use it to run under watch mode. Pass other Vitest options as usual.
 
+For some reason the vitest watcher is not working with Strapi. Therefore, I have devised a watcher to use with this plugin.
+- run `vitest:w` to run under watch mode. Pass other Vitest options as required.
 
 ### Noteworthy Changes
+
+#### v0.2.6
+
+- added scripts to make things easier 
+- fixed a few bugs
 
 #### v0.2.5
 

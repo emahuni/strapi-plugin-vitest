@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "description": "A Testing Strapi application",
   "scripts": {
-    "develop": "strapi develop",
-    "start": "strapi start",
-    "build": "strapi build",
+    "test-app:develop": "strapi develop",
+    "test-app:start": "strapi start",
+    "test-app:console": "strapi console",
+    "test-app:build": "rm -rfv dist .cache node_modules; strapi build",
     "strapi": "strapi"
   },
   "author": {
