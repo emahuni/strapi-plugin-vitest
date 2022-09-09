@@ -136,6 +136,10 @@ async function initTestHarness () {
   
   const peers = Object.entries(pkg.peerDependencies).map(p => p[0] + '@' + p[1]);
   
+  await fse.remove(resolve(paths.TEST_APP_DIR, 'dist')).catch(console.error);
+  await fse.remove(resolve(paths.TEST_APP_DIR, '.cache')).catch(console.error);
+  await fse.remove(resolve(paths.TEST_APP_DIR, 'node_modules')).catch(console.error);
+  
   console.info('\n');
   log_warn(`Please add the following packages to your project's %o if you received any messages about missing %o;
   using "pnpm/yarn add -D" or "npm install -D" with the following packages appended to that command:
