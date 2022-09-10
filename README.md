@@ -111,7 +111,11 @@ See example test file `app.test.js`, you can generate other test files like that
 #### Tests just quit with exist code 1
 
 - If tests quits with exit code 1, then ensure that sqlite3 is installed if you are using a SQLite database. Check package.json has sqlite3 installed. If not, do `pnpm add -D better-sqlite3`
-- Sometimes it may not be clear why the harness is failing to start. To see why startup is failing, if no real followable error is showing, run `NODE_ENV=test pnpm strapi start` (when used to test applications) or `NODE_ENV=test pnpm vitest:test-app:start`, that will run Strapi as usual, but within a test environment. Any errors being swallowed up by test suite will be thrown.
+- Sometimes it may not be clear why the harness is failing to start. To see why startup is failing, if no real followable error is showing:
+  - when strapi-plugin-vitest is used to test applications run `pnpm vitest:diag` which does `NODE_ENV=test pnpm strapi start` 
+  - when strapi-plugin-vitest is used to test plugins run `pnpm vitest:test-app:diag` which does `NODE_ENV=test pnpm vitest:test-app:start` 
+  
+  either commands (for applications or plugins) will run Strapi as usual, but within a test environment. **Any errors being swallowed up by test suite will be thrown**.
 
 #### Tests Watching
 

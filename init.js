@@ -161,6 +161,8 @@ async function initTestHarness () {
       s['vitest:test-app:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
       s['vitest:test-app:start'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:start`;
       s['vitest:test-app:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
+      s['vitest:test-app:diag'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && NODE_ENV=test ${pm} run test-app:start`;
+      s['vitest:diag'] = `NODE_ENV=test ${pm} run strapi start`;
       return s;
     },
   });
