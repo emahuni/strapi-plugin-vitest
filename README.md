@@ -24,7 +24,7 @@ Use your preferred package manager `yarn/pnpm/npm` where `pnpm` is mentioned.
 
 ### Initialization
 
-To initialize the harness, you need to run `pnpm strapi-plugin-vitest-init` 
+To initialize the harness, you need to run `pnpm vitest-init` 
 
 > This command is meant to be run once to expose the testing harness. However, you can run it any time to get the fresh/updated harness, and it will overwrite any existing harness files (VCS is essential here). You can freely edit these files if you wish to customize the harness or add new features through extensions and plugins. You can migrate your previous customizations through VCS diffs if you so run this command on existing customizations.
 
@@ -37,7 +37,7 @@ The initialization script:
 - _**creates/overwrites**_ `vitest.config.js` vitest configuration file
 - _**creates**_ a `config/env/test/database.(js|ts)` file if missing
 - _**adds**_ the following scripts to your `package.json` assist with initialization, usage and other chores _(please review them to see if they use the correct preferred package manager)_:
-  - `vitest:init` - executes script to initialize the test harness.
+  - `vitest-init` - executes script to initialize the test harness.
   - `vitest` - executes script to run vitest
   - `vitest:w` - executes script to run vitest in watch mode (custom watcher)
   - `vitest:test-app:clean` - executes script to clean test application build artifacts (only available with plugins)
@@ -136,13 +136,13 @@ For some reason the vitest watcher is not working with Strapi. Therefore, I have
 
 #### v0.2.2
 
-- Harness has a few fixes, therefore you need to run `strapi-plugin-vitest-init` to get the latest version of the harness. You don't have to back up any files, it'll be done for you.
+- Harness has a few fixes, therefore you need to run `vitest-init` to get the latest version of the harness. You don't have to back up any files, it'll be done for you.
 - The new harness can now be used to test standalone plugins
 
 
 #### v0.2.0
 
-- Harness has a few fixes, therefore you need to run `strapi-plugin-vitest-init` to get the latest version of the harness. Before you do, rename `vitest-config.js` to `vitest-config.bck.js`, if you have any changes, move them into the new `vitest-config.js`.
+- Harness has a few fixes, therefore you need to run `vitest-init` to get the latest version of the harness. Before you do, rename `vitest-config.js` to `vitest-config.bck.js`, if you have any changes, move them into the new `vitest-config.js`.
 - Once you re-init harness, note that it is now in `tests/helpers/harness` from `tests/helpers`. If you have any customizations in the old harness files, then you have to manually move any customizations into the new files before you delete the old files.
 
 

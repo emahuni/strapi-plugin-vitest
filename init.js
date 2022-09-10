@@ -155,7 +155,7 @@ async function initTestHarness () {
     scripts: s => {
       s.test = 'vitest';
       s['vitest:w'] = 'node ./tests/helpers/harness/vitest-watch.js';
-      s['vitest:init'] = 'strapi-plugin-vitest-init';
+      s['vitest-init'] = 'vitest-init';
       // test-app: is to make sure we are invoking the correct app
       s['vitest:test-app:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
       s['vitest:test-app:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
