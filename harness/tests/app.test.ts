@@ -1,9 +1,11 @@
 import type { Strapi } from '@strapi/strapi';
 import { beforeAll, afterAll, it, test, expect, describe } from 'vitest';
 // @ts-ignore
-import { info } from './helpers/harness/strapi-test-utils';
+import { packageInfo } from './helpers/harness/strapi-test-utils';
 
-describe(`# App "${(info.pluginName)}"`, () => {
+const appInfo = packageInfo();
+
+describe(`# App "${(appInfo.name)}"`, () => {
   /** this code is called once before all tests in this test file are called */
   beforeAll(async () => {
     //

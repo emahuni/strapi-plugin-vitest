@@ -3,7 +3,7 @@ const { resolve } = require('path');
 const paths = require('./paths.js');
 const { modifyPackageJsonFile } = require('modify-json-file');
 // noinspection NpmUsedModulesInstalled
-const { packageManager } = require('./dist/strapi-test-utils');
+const { preferredPackageManager } = require('./dist/strapi-test-utils');
 
 const pkg = JSON.parse(fse.readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
 const prjPkg = JSON.parse(fse.readFileSync(resolve(paths.CWD, './package.json'), { encoding: 'utf8' }));
@@ -136,7 +136,7 @@ async function initTestHarness () {
   await fse.remove(resolve(paths.TEST_APP_DIR, '.cache')).catch(console.error);
   await fse.remove(resolve(paths.TEST_APP_DIR, 'node_modules')).catch(console.error);
   
-  let pm = packageManager();
+  let pm = preferredPackageManager();
   
   if (pm) {
     console.info('\n')
@@ -153,9 +153,9 @@ async function initTestHarness () {
     //   return d;
     // },
     scripts: s => {
+      delete s['vitest:init'];
       s.test = 'vitest';
       s['vitest:w'] = 'node ./tests/helpers/harness/vitest-watch.js';
-      s['vitest-init'] = 'vitest-init';
       // test-app: is to make sure we are invoking the correct app
       s['vitest:test-app:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
       s['vitest:test-app:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;

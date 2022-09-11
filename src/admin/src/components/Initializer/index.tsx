@@ -5,7 +5,10 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-import { id as pluginId } from '../../../../../pluginId';
+// @ts-expect-error
+import { packageInfo } from './dist/strapi-test-utils';
+
+const pluginInfo = packageInfo();
 
 type InitializerProps = {
   setPlugin: (id: string) => void;
@@ -14,11 +17,11 @@ type InitializerProps = {
 const Initializer: React.FC<InitializerProps> = ({ setPlugin }) => {
   const ref = useRef<(id: string) => void | null>(null);
   ref.current = setPlugin;
-
+  
   useEffect(() => {
-    ref.current(pluginId);
+    ref.current(pluginInfo.id);
   }, []);
-
+  
   return null;
 };
 

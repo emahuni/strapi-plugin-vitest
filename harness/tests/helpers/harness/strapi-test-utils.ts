@@ -3,57 +3,17 @@
  * @param {String | number} idOrEmail, either user id, or email
  */
 import type { Strapi } from '@strapi/strapi';
-import { resolve } from 'path';
-import { readFileSync, existsSync } from 'fs';
 
 // reliable way to get to a file, especially when using workspaces & pnp modules
-import where from 'where-is';
+import { preferredPackageManager, packageInfo as packageInf } from '@emanimation/strapi-utils';
 
-export const info = {
-  get packageRootPath () {
-    let path, cwd = process.cwd();
-    do {
-      path = where('package.json', cwd);
-      // console.debug(`[strapi-test-utils/packageRootPath()]-17: where is package.json -> path: %o`, path);
-      cwd = resolve(cwd, '..'); // step 1 dir back in case we are in test-app directory
-    } while (path.includes('test-app')); // just make sure that this is not the test-app package.json's path
-    
-    if (!path) throw new Error('Couldn\'t find package.json that doesn\'t belong to test-app package.');
-    
-    return path;
-  },
-  get projectPkg () {
-    return JSON.parse(readFileSync(resolve(this.packageRootPath, 'package.json'), { encoding: 'utf8' }));
-  },
-  get pluginName () { return this.projectPkg.name; },
-  get pluginId () { return this.pluginName.replace(/^(@.*|strapi-)plugin-/i, ''); },
-  get pluginUid () { return `plugin::${this.pluginId}`; },
-};
-
-
-export function packageManager () {
-  let pm;
-  
-  let cwd = process.cwd();
-  do {
-    // todo what about if it's .pnp that don't have a node_modules
-    cwd = where('node_modules', cwd);
-    if (!cwd) break;
-    
-    // console.debug(`[strapi-test-utils/packageRootPath()]-17: where is package.json -> path: %o`, path);
-    if (existsSync(resolve(cwd, './pnpm-lock.yaml'))) {
-      pm = 'pnpm';
-    } else if (existsSync(resolve(cwd, './yarn-lock.json'))) {
-      pm = 'yarn';
-    } else if (existsSync(resolve(cwd, './yarn-lock.json'))) {
-      pm = 'npm';
-    }
-    
-    if (!pm) cwd = resolve(cwd, '..'); // step 1 dir back since we didn't find a lock file
-  } while (!pm);
-  
-  return pm;
+export function packageInfo () {
+  return packageInf((path) => !path.includes('test-app'));
 }
+
+export {
+  preferredPackageManager,
+};
 
 
 export async function jwt (idOrEmail) {

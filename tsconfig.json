@@ -5,7 +5,8 @@
     "rootDir": "src",
     /* Disable emitting files if any type checking errors are reported. */
     "noEmitOnError": false,
-    "jsx": "react"
+    "jsx": "react",
+    "incremental": false
   },
   "include": [
     // Include the root directory
@@ -14,7 +15,7 @@
     "src/**/*.json",
     "src/admin/src",
     // include testing utils
-    "src/strapi-test-utils.ts", // this is a symlink to the actual file in harness, reason ts wants to compile files in rootDir only
+    "src/strapi-test-utils.ts" // this is a symlink to the actual file in harness, reason ts wants to compile files in rootDir only
   ],
   "exclude": [
     "node_modules/",

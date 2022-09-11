@@ -1,13 +1,15 @@
 // @ts-ignore
 import paths = require('strapi-plugin-vitest/paths');
 // @ts-ignore
-import { info } from 'strapi-plugin-vitest/dist/strapi-test-utils';
+import { packageInfo } from 'strapi-plugin-vitest/dist/strapi-test-utils';
+
+const pluginInfo = packageInfo();
 
 export default ({ env }) => ({
   /** dig out the plugin we are testing */
-  [info.pluginId]: {
+  [pluginInfo.id]: {
     enabled: true,
-    resolve: info.packageRootPath,
+    resolve: pluginInfo.rootPath,
     config:  {
       // if your plugin requires any configuration, then put it here
     },
