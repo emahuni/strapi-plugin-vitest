@@ -5,6 +5,7 @@
 import type { Strapi } from '@strapi/strapi';
 
 // reliable way to get to a file, especially when using workspaces & pnp modules
+// @ts-ignore
 import { preferredPackageManager, packageInfo as packageInf } from '@emanimation/strapi-utils';
 
 export function packageInfo () {

@@ -3,7 +3,7 @@ const { spawn } = require('child_process');
 // noinspection NpmUsedModulesInstalled just use the one that ships with Strapi
 const debounce = require('lodash.debounce');
 // noinspection NpmUsedModulesInstalled
-const { packageManager } = require('strapi-plugin-vitest/dist/strapi-test-utils');
+const { preferredPackageManager } = require('@emanimation/strapi-utils');
 
 const yargs = require('yargs/yargs');
 
@@ -41,7 +41,7 @@ for (const k in argv) {
 console.debug(`[vitest-watch/()]-62: runMode: %o, args: %o`, runMode, args);
 
 const vitestConfig = require('../../../vitest.config.js');
-let pm = packageManager();
+let pm = preferredPackageManager();
 if (pm) {
   console.info('\n');
   console.info('Using %o package manager...', pm);
