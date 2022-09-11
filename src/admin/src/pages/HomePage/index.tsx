@@ -5,12 +5,14 @@
  */
 
 import React from 'react';
-import { id as pluginId } from '../../../../../pluginId';
+import { packageInfo } from '@emanimation/strapi-utils';
+
+const pluginInfo  = packageInfo();
 
 const HomePage: React.VoidFunctionComponent = () => {
   return (
     <div>
-      <h1>{pluginId}&apos;s HomePage</h1>
+      <h1>{pluginInfo.id}&apos;s HomePage</h1>
       <p>Happy coding</p>
     </div>
   );

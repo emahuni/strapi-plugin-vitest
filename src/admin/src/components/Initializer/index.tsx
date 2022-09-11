@@ -5,8 +5,7 @@
  */
 
 import React, { useEffect, useRef } from 'react';
-// @ts-expect-error
-import { packageInfo } from './dist/strapi-test-utils';
+import { packageInfo } from '@emanimation/strapi-utils';
 
 const pluginInfo = packageInfo();
 

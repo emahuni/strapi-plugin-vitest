@@ -1,5 +1,7 @@
-import { id as pluginId } from '../../../../pluginId';
+import { packageInfo } from '@emanimation/strapi-utils';
 
-const getTrad = (id: string) => `${pluginId}.${id}`;
+const pluginInfo = packageInfo();
+
+const getTrad = (id: string) => `${pluginInfo.id}.${id}`;
 
 export default getTrad;
