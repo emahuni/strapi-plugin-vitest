@@ -1,9 +1,11 @@
 import type { Strapi } from '@strapi/strapi';
-import { name } from '../../pluginId';
 import chalk from 'chalk';
+import { packageInfo } from '@emanimation/strapi-utils';
 
-export default ({ strapi }: { strapi: Strapi }) => {
-  strapi.log.info(chalk`{dim [bootstrap/()]-4:} bootstraping "${name}"...`);
-};
+const pluginInfo = packageInfo();
+
+export default function bootstrap ({ strapi }: { strapi: Strapi }) {
+  strapi.log.info(chalk`{dim [bootstrap]-4:} bootstraping "${pluginInfo.name}"...`);
+}
 
 

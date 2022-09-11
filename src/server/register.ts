@@ -1,12 +1,14 @@
 import type { Strapi } from '@strapi/strapi';
-import { name, id } from '../../pluginId';
 import chalk from 'chalk';
+import { packageInfo } from '@emanimation/strapi-utils';
 
-export default async ({ strapi }: { strapi: Strapi }) => {
-  strapi.log.info(chalk`{dim [register/()]-6:} registering "${name}"...`);
+const pluginInfo = packageInfo();
+
+export default async function register ({ strapi }: { strapi: Strapi }) {
+  strapi.log.info(chalk`{dim [register]-6:} registering "${pluginInfo.name}"...`);
   if (process.env.NODE_ENV === 'test') {
-    if (strapi.plugins[id].config('cleanDBAtRegister')) {
+    if (strapi.plugins[pluginInfo.id].config('cleanDBAtRegister')) {
       await strapi.services['plugin::vitest.utils'].cleanDB();
     }
   }
-};
+}
