@@ -1,7 +1,5 @@
 // @ts-ignore
-import paths = require('strapi-plugin-vitest/paths');
-// @ts-ignore
-import { packageInfo } from 'strapi-plugin-vitest/dist/strapi-test-utils';
+import { packageInfo } from '../../strapi-test-utils';
 
 const pluginInfo = packageInfo();
 

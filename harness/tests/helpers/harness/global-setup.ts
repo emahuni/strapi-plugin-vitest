@@ -1,4 +1,4 @@
-import process from 'process';
+import process = require( 'process');
 // @ts-ignore
 import { packageInfo } from './strapi-test-utils';
 

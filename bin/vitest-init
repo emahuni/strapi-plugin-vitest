@@ -96,6 +96,11 @@ async function initTestHarness () {
       false,
   );
   
+  if (await pathExists(resolve(paths.TEST_DIR_HARNESS_PATH, 'vitest-init.js'))) {
+    log('Removing redundant %o file...', resolve(paths.TEST_DIR_HARNESS_PATH, 'vitest-init.js'));
+    await remove(resolve(paths.TEST_DIR_HARNESS_PATH, 'vitest-init.js'));
+  }
+  
   if (prjPkg?.strapi?.kind === 'plugin') {
     await copy(
         paths.PLUGIN_HARNESS_TEST_APP_DIR,
