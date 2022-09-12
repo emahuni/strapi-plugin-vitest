@@ -156,41 +156,33 @@ async function initTestHarness () {
       paths.VITEST_CONFIG_FILE,
       false,
   );
-  const peerDeps = [];
-  const peerDevDeps = [];
+  const pluginDeps = [];
+  const pluginDevDeps = [];
   const prjDeps = Object.keys(prjPkg.dependencies);
   const prjDevDeps = Object.keys(prjPkg.devDependencies);
-  Object.entries(pkg.peerDependencies)
-        .filter(p => {
-          return isPrjPlugin || !p[0].includes('@strapi');
-        })
-        .forEach(p => {
-          const [name, version] = p;
-          // check if the dependency is already defined in the prjPkg (in both devDependencies & dependencies sections)
-          // and just update the version, except for actual strapi packages
-          if (prjDeps.includes(name)) {
-            if (!/^@strapi/.test(name)) {
-              // todo check if our version is compatible with the current version, complain if not
-              peerDeps.push(name + '@' + version);
-            }
-          } else if (prjDevDeps.includes(name)) {
-            if (!/^@strapi/.test(name)) {
-              // todo check if our version is compatible with the current version, complain if not
-              peerDevDeps.push(name + '@' + version);
-            }
-          } else {
-            // otherwise just add to devDependencies
-            peerDevDeps.push(name + '@' + version);
-          }
-        });
-  
+  inferDependencies(
+      'dependencies',
+      pkg.pluginDependencies,
+      pluginDeps,
+      pluginDevDeps,
+      prjDeps,
+      prjDevDeps,
+  );
+  inferDependencies(
+      'devDependencies',
+      pkg.pluginDevDependencies,
+      pluginDeps,
+      pluginDevDeps,
+      prjDeps,
+      prjDevDeps,
+  );
   
   await remove(resolve(paths.TEST_APP_DIR, 'dist')).catch(console.error);
   await remove(resolve(paths.TEST_APP_DIR, '.cache')).catch(console.error);
   await remove(resolve(paths.TEST_APP_DIR, 'node_modules')).catch(console.error);
   
-  const peersDepsCmd = pm === 'npm' ? `npm install -D ${peerDeps.join(' ')}` : `${pm} add -D ${peerDeps.join(' ')}`;
-  const peersDevDepsCmd = pm === 'npm' ? `npm install -D ${peerDevDeps.join(' ')}` : `${pm} add -D ${peerDevDeps.join(' ')}`;
+  const peersDepsCmd = pm === 'npm' ? `npm install -D ${pluginDeps.join(' ')}` : `${pm} add -D ${pluginDeps.join(' ')}`;
+  const peersDevDepsCmd = pm === 'npm' ? `npm install -D ${pluginDevDeps.join(' ')}` : `${pm} add -D ${pluginDevDeps.join(' ')}`;
   
   await modifyPackageJsonFile('./package.json', {
     // todo use modify-json-file to add useful package.json devDependencies
@@ -201,8 +193,8 @@ async function initTestHarness () {
     scripts: s => {
       delete s['vitest:init'];
       delete s['vitest:install-peers'];
-      delete s['vitest:peers-devDeps'];
-      delete s['vitest:peers-deps'];
+      delete s['vitest:devDeps'];
+      delete s['vitest:deps'];
       s.test = 'vitest';
       s['vitest:w'] = ` ${pm} run vitest-watch`;
       // test-app: is to make sure we are invoking the correct app
@@ -212,21 +204,23 @@ async function initTestHarness () {
       s['vitest:test-app:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
       s['vitest:test-app:diag'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && NODE_ENV=test ${pm} run test-app:start`;
       s['vitest:diag'] = `NODE_ENV=test ${pm} run strapi start`;
-      if (peerDevDeps.length > 0) s['vitest:peers-devDeps'] = peersDevDepsCmd;
-      if (peerDeps.length > 0) s['vitest:peers-deps'] = peersDepsCmd;
+      if (pluginDevDeps.length > 0) s['vitest:devDeps'] = peersDevDepsCmd;
+      if (pluginDeps.length > 0) s['vitest:deps'] = peersDepsCmd;
       return s;
     },
   });
   
-  console.info('\n');
-  log_warn(`Please run package.json script(s):`);
-  if (peerDeps.length > 0) {
-    console.info(`   %o to update required packages in your project's %o`, 'vitest:peers-deps', 'dependencies');
+  if (pluginDeps.length > 0 || pluginDevDeps.length > 0) {
+    console.info('\n');
+    log_warn(`Please run package.json script(s):`);
+    if (pluginDeps.length > 0) {
+      console.info(`   %o to update required packages in your project's %o`, 'vitest:deps', 'dependencies');
+    }
+    if (pluginDevDeps.length > 0) {
+      console.info(`   %o to add/update required packages in your project's %o`, 'vitest:devDeps', 'devDependencies');
+    }
+    console.info(chalk.dim`      - You can edit the scripts in your "package.json" file.\n      - If you remove any packages from that script, be sure to edit the harness for the ones you remove where the packages are used.`);
   }
-  if (peerDevDeps.length > 0) {
-    console.info(`   %o to add/update required packages in your project's %o`, 'vitest:peers-devDeps', 'devDependencies');
-  }
-  console.info(chalk.dim`      - You can edit the scripts in your "package.json" file.\n      - If you remove any packages from that script, be sure to edit the harness for the ones you remove where the packages are used.`);
 }
 
 
@@ -241,4 +235,32 @@ function ensureDependenciesProps (pkg) {
   if (!pkg.dependencies) pkg.dependencies = {};
   if (!pkg.devDependencies) pkg.devDependencies = {};
   if (!pkg.peerDependencies) pkg.peerDependencies = {};
+}
+
+
+function inferDependencies (defaultType, deps, pluginDeps, pluginDevDeps, prjDeps, prjDevDeps) {
+  Object.entries(deps)
+        .filter(p => {
+          return isPrjPlugin || !p[0].includes('@strapi');
+        })
+        .forEach(p => {
+          const [name, version] = p;
+          // check if the dependency is already defined in the prjPkg (in both devDependencies & dependencies sections)
+          // and just update the version, except for actual strapi packages
+          if (prjDeps.includes(name)) {
+            if (!/^@strapi/.test(name) && version !== prjPkg.dependencies[name].replace(/workspace:/, '')) {
+              // todo check if our version is compatible with the current version, complain if not
+              pluginDeps.push(name + '@' + version);
+            }
+          } else if (prjDevDeps.includes(name)) {
+            if (!/^@strapi/.test(name) && version !== prjPkg.devDependencies[name].replace(/workspace:/, '')) {
+              // todo check if our version is compatible with the current version, complain if not
+              pluginDevDeps.push(name + '@' + version);
+            }
+          } else {
+            // else just add it to either dependencies or devDependencies
+            if (defaultType === 'dependencies') pluginDeps.push(name + '@' + version);
+            else pluginDevDeps.push(name + '@' + version);
+          }
+        });
 }
