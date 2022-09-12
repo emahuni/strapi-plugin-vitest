@@ -97,7 +97,6 @@ async function initTestHarness () {
       paths.TEST_DIR_HARNESS_PATH,
       false,
   );
-
   if (await pathExists(resolve(paths.TEST_DIR_HARNESS_PATH, 'vitest-init.js'))) {
     log('Removing redundant %o file...', resolve(paths.TEST_DIR_HARNESS_PATH, 'vitest-init.js'));
     await remove(resolve(paths.TEST_DIR_HARNESS_PATH, 'vitest-init.js'));
@@ -140,7 +139,6 @@ async function initTestHarness () {
       paths.VITEST_CONFIG_FILE,
       false,
   );
-
   const peers = Object.entries(pkg.peerDependencies)
                       .filter(p => isPrjPlugin || !p[0].includes('@strapi'))
                       .map(p => p[0] + '@' + p[1]);
@@ -160,6 +158,8 @@ async function initTestHarness () {
     pm = 'npm';
   }
 
+  const peersInstallCmd = pm === 'npm' ? `npm install -D ${peers.join(' ')}` : `${pm} add -D ${peers.join(' ')}`;
+
   await modifyPackageJsonFile('./package.json', {
     // todo use modify-json-file to add useful package.json devDependencies
     // devDependencies: d => {
@@ -177,17 +177,13 @@ async function initTestHarness () {
       s['vitest:test-app:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
       s['vitest:test-app:diag'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && NODE_ENV=test ${pm} run test-app:start`;
       s['vitest:diag'] = `NODE_ENV=test ${pm} run strapi start`;
+      s['vitest:install-peers'] = peersInstallCmd;
       return s;
     },
   });
 
-  if (pm === 'pnpm') {
-    log_warn(`Please run the following to add packages to your project's %o if you received any messages about missing %o; or configure pnpm to %o to skip the following manual installation.\n\n%o\n`, 'devDependencies', 'peerDependencies', 'auto-install-peers', `pnpm add -D ${peers.join(' ')}`);
-  } else {
-    log_warn(`Please add the following packages to your project's %o (if you received any messages about missing %o); using:\n\n%o \n`, 'devDependencies', 'peerDependencies', pm === 'npm' ? 'yarn add -D ' + peers.join(' ') : 'npm install -D ' + peers.join(' '));
-  }
-
-  console.info(`   - If you remove any package from that list be sure to edit the harness, for the ones you remove in %o, where the packages are used.`, './tests/helpers/harness');
+  log_warn(`Please run this "new/updated" package.json script: %o to add required packages to your project's %o`, 'vitest:install-peers', 'devDependencies');
+  console.info(`   - You can edit the packages from your "package.json" file.\n   - If you remove any packages from that script, be sure to edit the harness for the ones you remove where the packages are used.`, './tests/helpers/harness');
 }
 
 
