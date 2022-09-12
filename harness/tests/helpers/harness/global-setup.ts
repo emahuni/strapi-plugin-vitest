@@ -1,6 +1,6 @@
 import process = require( 'process');
 // @ts-ignore
-import { packageInfo } from './strapi-test-utils';
+import { packageInfo } from '@emanimation/strapi-utils';
 
 // @ts-ignore
 import paths = require('strapi-plugin-vitest/paths');

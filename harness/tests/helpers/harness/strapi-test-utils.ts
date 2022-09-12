@@ -4,19 +4,6 @@
  */
 import type { Strapi } from '@strapi/strapi';
 
-// reliable way to get to a file, especially when using workspaces & pnp modules
-// @ts-ignore
-import { preferredPackageManager, packageInfo as packageInf } from '@emanimation/strapi-utils';
-
-export function packageInfo () {
-  return packageInf((path) => !path.includes('test-app'));
-}
-
-export {
-  preferredPackageManager,
-};
-
-
 export async function jwt (idOrEmail) {
   return strapi.plugins['users-permissions'].services.jwt.issue({
     [Number.isInteger(idOrEmail) ? 'id' : 'email']: idOrEmail,

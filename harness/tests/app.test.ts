@@ -1,7 +1,7 @@
 import type { Strapi } from '@strapi/strapi';
 import { beforeAll, afterAll, it, test, expect, describe } from 'vitest';
 // @ts-ignore
-import { packageInfo } from './helpers/harness/strapi-test-utils';
+import { packageInfo } from '@emanimation/strapi-utils';
 
 const appInfo = packageInfo();
 

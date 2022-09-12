@@ -1,5 +1,5 @@
 // @ts-ignore
-import { packageInfo } from '../src/utils/strapi-test-utils';
+import { packageInfo } from '@emanimation/strapi-utils';
 
 const pluginInfo = packageInfo();
 
