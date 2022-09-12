@@ -8,7 +8,8 @@
     "kind": "plugin"
   },
   "bin": {
-    "vitest-init": "bin/vitest-init"
+    "vitest-init": "bin/vitest-init",
+    "vitest-watch": "bin/vitest-watch"
   },
   "peerDependencies": {
     "@emanimation/strapi-utils": "workspace:^0.1.1",
