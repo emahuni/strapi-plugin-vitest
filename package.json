@@ -56,15 +56,7 @@
     "develop": "tsc -w",
     "build": "rm -rfv dist && tsc",
     "build:w": "tsc -w",
-    "prepack": "rm -rfv dist; rm -fv tsconfig.tsbuildinfo && tsc && git commit -am 'build(package: build for current version.'; echo '✨ Done building ✓'",
-    "test": "vitest",
-    "vitest:w": "node ./tests/helpers/harness/vitest-watch.js",
-    "vitest:test-app:clean": "cd /Users/em/dev/projects/applications/Aivir/libs/strapi-plugin-vitest/tests/helpers/harness/test-app; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'",
-    "vitest:test-app:develop": "cd /Users/em/dev/projects/applications/Aivir/libs/strapi-plugin-vitest/tests/helpers/harness/test-app && pnpm run test-app:develop",
-    "vitest:test-app:start": "cd /Users/em/dev/projects/applications/Aivir/libs/strapi-plugin-vitest/tests/helpers/harness/test-app && pnpm run test-app:start",
-    "vitest:test-app:console": "cd /Users/em/dev/projects/applications/Aivir/libs/strapi-plugin-vitest/tests/helpers/harness/test-app && pnpm run test-app:console",
-    "vitest:test-app:diag": "cd /Users/em/dev/projects/applications/Aivir/libs/strapi-plugin-vitest/tests/helpers/harness/test-app && NODE_ENV=test pnpm run test-app:start",
-    "vitest:diag": "NODE_ENV=test pnpm run strapi start"
+    "prepack": "rm -rfv dist; rm -fv tsconfig.tsbuildinfo && tsc && git commit -am 'build(package: build for current version.'; echo '✨ Done building ✓'"
   },
   "license": "MIT"
 }
