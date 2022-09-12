@@ -219,7 +219,7 @@ async function initTestHarness () {
     if (pluginDevDeps.length > 0) {
       console.info(`   %o to add/update required packages in your project's %o`, 'vitest:devDeps', 'devDependencies');
     }
-    console.info(chalk.dim`      - You can edit the scripts in your "package.json" file.\n      - If you remove any packages from that script, be sure to edit the harness for the ones you remove where the packages are used.`);
+    console.info(chalk.dim`      - You can edit the scripts in your "package.json" file.\n      - If you remove any packages from that script, be sure to edit the harness for the ones you remove where the packages are used.\n      - You can remove the scripts once you are done.`);
   }
 }
 
