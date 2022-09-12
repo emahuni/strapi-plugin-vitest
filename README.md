@@ -44,7 +44,7 @@ The initialization script:
   - `vitest:test-app:console` - executes script to run the test application in console mode (only available with plugins)
   - `vitest:test-app:diag` - executes script to run the test application in start mode, but in a test environment to allow you to diagnose problems. See troubleshooting for more information.
   - `vitest:diag` - executes script to run your application in start mode, but in a test environment to allow you to diagnose problems. See troubleshooting for more information.
-  - `vitest:install-peers` - executes script to install required peer dependencies, just run it after every init. You can remove this script once you are done with it.
+  - `vitest:peers-devDeps` - executes script to install required peer dependencies, just run it after every init. You can remove this script once you are done with it.
 - tells you important peer dependencies that you must install inorder to use the harness.
 
 ### Configuration
@@ -112,7 +112,7 @@ See example test file `app.test.ts`/`plugin.test.ts`, you can generate other sim
 
 #### Tests just quit with exist code 1
 
-- If tests quits with errors or not, first ensure all required plugin peer dependencies were installed before using this harness. You can quickly do so by running the added script `pnpm vitest:install-peers`, you can remove this script once you are done with it.
+- If tests quits with errors or not, first ensure all required plugin peer dependencies were installed before using this harness. You can quickly do so by running the added script `pnpm vitest:peers-devDeps`, you can remove this script once you are done with it.
 - Sometimes it may not be clear why the harness is failing to start. To see why startup is failing, if no real followable error is showing:
   - when strapi-plugin-vitest is used to test applications run `pnpm vitest:diag` which does `NODE_ENV=test pnpm strapi start` 
   - when strapi-plugin-vitest is used to test plugins run `pnpm vitest:test-app:diag` which does `NODE_ENV=test pnpm vitest:test-app:start` 

@@ -38,7 +38,7 @@ async function copy (sourcePath, targetPath, checkIfExists = true) {
       log_err(`Error checking if %o exists`, targetPath);
     }
   }
-
+  
   if (!checkIfExists || !exists) {
     if (checkIfExists) log(`%o doesn't exists, adding...`, targetPath);
     log(`Copying to: %o...`, targetPath);
@@ -60,7 +60,7 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
   } catch (err) {
     log_err(`Error checking if %o exists`, targetPath);
   }
-
+  
   if (!!exists) {
     const i = targetPath.lastIndexOf('.');
     const bck = ~i ? targetPath.substring(i, -1) + '.' + SERIAL + targetPath.substring(i) : targetPath + '.' + SERIAL;
@@ -71,7 +71,7 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
       log_err(err);
     }
   }
-
+  
   log(`Copying to: %o...`, targetPath);
   try {
     await fseCopy(sourcePath, targetPath);
@@ -85,13 +85,13 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
 
 async function initTestHarness () {
   console.info('\n');
-
+  
   try {
     await ensureDir(paths.TEST_DIR_PATH);
   } catch (err) {
     log_err(`Error checking if %o dir exists!`, paths.TEST_DIR_PATH);
   }
-
+  
   await copy(
       paths.PLUGIN_HARNESS_PATH,
       paths.TEST_DIR_HARNESS_PATH,
@@ -101,7 +101,7 @@ async function initTestHarness () {
     log('Removing redundant %o file...', resolve(paths.TEST_DIR_HARNESS_PATH, 'vitest-init.js'));
     await remove(resolve(paths.TEST_DIR_HARNESS_PATH, 'vitest-init.js'));
   }
-
+  
   if (isPrjPlugin) {
     await copy(
         paths.PLUGIN_HARNESS_TEST_APP_DIR,
@@ -111,7 +111,7 @@ async function initTestHarness () {
     // let's correct the symlink to the utils file
     await remove(resolve(paths.TEST_APP_DIR, 'src/utils/strapi-test-utils.ts'));
     await ensureSymlink(resolve(paths.TEST_DIR_HARNESS_PATH, 'strapi-test-utils.ts'), resolve(paths.TEST_APP_DIR, 'src/utils/strapi-test-utils.ts'));
-
+    
     await copy(
         paths.PLUGIN_HARNESS_PLUGIN_TESTS_PATH,
         paths.APP_PLUGIN_TEST_PATH,
@@ -123,36 +123,43 @@ async function initTestHarness () {
     } catch (err) {
       log_err(`Error checking if %o dir exists!`, paths.TEST_ENV_DB_CONFIG_DIR);
     }
-
+    
     await copy(
         paths.PLUGIN_HARNESS_DB_CONFIG_FILE,
         paths.TEST_ENV_DB_CONFIG_FILE,
         true,
     );
-
+    
     await copy(
         paths.PLUGIN_HARNESS_APP_TESTS_PATH,
         paths.APP_TEST_PATH,
         false,
     );
   }
-
+  
   await copy(
       paths.PLUGIN_HARNESS_VITEST_CONFIG_FILE,
       paths.VITEST_CONFIG_FILE,
       false,
   );
-  const peers = Object.entries(pkg.peerDependencies)
-                      .filter(p => isPrjPlugin || !p[0].includes('@strapi'))
-                      .map(p => p[0] + '@' + p[1]);
-
-
+  const peerDeps = [];
+  const peerDevDeps = [];
+  Object.entries(pkg.peerDependencies)
+        .filter(p => {
+          return isPrjPlugin || !p[0].includes('@strapi');
+        })
+        .forEach(p => {
+          // todo check if the dependency is already defined in the prjPkg (in both devDependencies & dependencies sections) and just update the version, except for actual strapi packages
+           peerDevDeps.push(p[0] + '@' + p[1]);
+        });
+  
+  
   await remove(resolve(paths.TEST_APP_DIR, 'dist')).catch(console.error);
   await remove(resolve(paths.TEST_APP_DIR, '.cache')).catch(console.error);
   await remove(resolve(paths.TEST_APP_DIR, 'node_modules')).catch(console.error);
-
+  
   let pm = preferredPackageManager();
-
+  
   if (pm) {
     console.info('\n');
     log('Using %o package manager...', pm);
@@ -160,9 +167,10 @@ async function initTestHarness () {
     log_warn(`Couldn't find lock file to determine package manager. Please run install to generate a lock file first. Using npm as a default.`);
     pm = 'npm';
   }
-
-  const peersInstallCmd = pm === 'npm' ? `npm install -D ${peers.join(' ')}` : `${pm} add -D ${peers.join(' ')}`;
-
+  
+  const peersDepsCmd = pm === 'npm' ? `npm install -D ${peerDeps.join(' ')}` : `${pm} add -D ${peerDeps.join(' ')}`;
+  const peersDevDepsCmd = pm === 'npm' ? `npm install -D ${peerDevDeps.join(' ')}` : `${pm} add -D ${peerDevDeps.join(' ')}`;
+  
   await modifyPackageJsonFile('./package.json', {
     // todo use modify-json-file to add useful package.json devDependencies
     // devDependencies: d => {
@@ -180,12 +188,13 @@ async function initTestHarness () {
       s['vitest:test-app:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
       s['vitest:test-app:diag'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && NODE_ENV=test ${pm} run test-app:start`;
       s['vitest:diag'] = `NODE_ENV=test ${pm} run strapi start`;
-      s['vitest:install-peers'] = peersInstallCmd;
+      s['vitest:peers-devDeps'] = peersDevDepsCmd;
+      // s['vitest:peers-deps'] = peersDepsCmd;
       return s;
     },
   });
-
-  log_warn(`Please run this "new/updated" package.json script: %o to add required packages to your project's %o`, 'vitest:install-peers', 'devDependencies');
+  
+  log_warn(`Please run this "new/updated" package.json script: %o to add required packages to your project's %o`, 'vitest:peers-devDeps', 'devDependencies');
   console.info(`   - You can edit the packages from your "package.json" file.\n   - If you remove any packages from that script, be sure to edit the harness for the ones you remove where the packages are used.`, './tests/helpers/harness');
 }
 
