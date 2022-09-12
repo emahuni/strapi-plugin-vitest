@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { copy: fseCopy, ensureDir, move, pathExists, remove, readFileSync } = require('fs-extra');
+const { copy: fseCopy, ensureDir, move, pathExists, remove, readFileSync, ensureSymlink } = require('fs-extra');
 const { resolve } = require('path');
 const paths = require('../paths.js');
 const { modifyPackageJsonFile } = require('modify-json-file');
@@ -108,6 +108,9 @@ async function initTestHarness () {
         paths.TEST_APP_DIR,
         false,
     );
+    // let's correct the symlink to the utils file
+    await remove(resolve(paths.TEST_APP_DIR, 'src/utils/strapi-test-utils.ts'));
+    await ensureSymlink(resolve(paths.TEST_DIR_HARNESS_PATH, 'strapi-test-utils.ts'), resolve(paths.TEST_APP_DIR, 'src/utils/strapi-test-utils.ts'));
 
     await copy(
         paths.PLUGIN_HARNESS_PLUGIN_TESTS_PATH,
