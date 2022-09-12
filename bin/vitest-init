@@ -2,30 +2,33 @@
 
 const { copy: fseCopy, ensureDir, move, pathExists, remove, readFileSync, ensureSymlink } = require('fs-extra');
 const { resolve } = require('path');
+const chalk = require('chalk');
 const paths = require('../paths.js');
 const { modifyPackageJsonFile } = require('modify-json-file');
 // noinspection NpmUsedModulesInstalled
 const { preferredPackageManager } = require('@emanimation/strapi-utils');
 
 const pkg = JSON.parse(readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
+ensureDependenciesProps(pkg);
 const prjPkg = JSON.parse(readFileSync(resolve(paths.CWD, './package.json'), { encoding: 'utf8' }));
+ensureDependenciesProps(prjPkg);
 const isPrjPlugin = prjPkg?.strapi?.kind === 'plugin';
 
 const SERIAL = Date.now();
 
 
 function log (str, ...rest) {
-  console.log(`🛠  [${pkg.name}]: ${str}`, ...rest);
+  console.log(chalk`{dim 🛠  [${pkg.name}]:} ${str}`, ...rest);
 }
 
 
 function log_warn (str, ...rest) {
-  console.warn(`⚠️  [${pkg.name}]: ${str}`, ...rest);
+  console.warn(chalk`{dim ⚠️  [${pkg.name}]:} ${str}`, ...rest);
 }
 
 
 function log_err (str, ...rest) {
-  console.error(`❌  [${pkg.name}]: ${str}`, ...rest);
+  console.error(`{dim ❌  [${pkg.name}]:} ${str}`, ...rest);
 }
 
 
@@ -84,6 +87,17 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
 
 
 async function initTestHarness () {
+  console.info(chalk`{bold   Emanimation {magenta Strapi} {yellow Vitest} {green Harness}.}`);
+  let pm = preferredPackageManager();
+  
+  if (pm) {
+    console.info('\n');
+    log('Detected %o package manager as the preferred package manager...', pm);
+  } else {
+    log_warn(`Couldn't find lock file to determine package manager. Please run install to generate a lock file first.\nAssuming npm as the preferred package manager.`);
+    pm = 'npm';
+  }
+  
   console.info('\n');
   
   try {
@@ -144,29 +158,36 @@ async function initTestHarness () {
   );
   const peerDeps = [];
   const peerDevDeps = [];
+  const prjDeps = Object.keys(prjPkg.dependencies);
+  const prjDevDeps = Object.keys(prjPkg.devDependencies);
   Object.entries(pkg.peerDependencies)
         .filter(p => {
           return isPrjPlugin || !p[0].includes('@strapi');
         })
         .forEach(p => {
-          // todo check if the dependency is already defined in the prjPkg (in both devDependencies & dependencies sections) and just update the version, except for actual strapi packages
-           peerDevDeps.push(p[0] + '@' + p[1]);
+          const [name, version] = p;
+          // check if the dependency is already defined in the prjPkg (in both devDependencies & dependencies sections)
+          // and just update the version, except for actual strapi packages
+          if (prjDeps.includes(name)) {
+            if (!/^@strapi/.test(name)) {
+              // todo check if our version is compatible with the current version, complain if not
+              peerDeps.push(name + '@' + version);
+            }
+          } else if (prjDevDeps.includes(name)) {
+            if (!/^@strapi/.test(name)) {
+              // todo check if our version is compatible with the current version, complain if not
+              peerDevDeps.push(name + '@' + version);
+            }
+          } else {
+            // otherwise just add to devDependencies
+            peerDevDeps.push(name + '@' + version);
+          }
         });
   
   
   await remove(resolve(paths.TEST_APP_DIR, 'dist')).catch(console.error);
   await remove(resolve(paths.TEST_APP_DIR, '.cache')).catch(console.error);
   await remove(resolve(paths.TEST_APP_DIR, 'node_modules')).catch(console.error);
-  
-  let pm = preferredPackageManager();
-  
-  if (pm) {
-    console.info('\n');
-    log('Using %o package manager...', pm);
-  } else {
-    log_warn(`Couldn't find lock file to determine package manager. Please run install to generate a lock file first. Using npm as a default.`);
-    pm = 'npm';
-  }
   
   const peersDepsCmd = pm === 'npm' ? `npm install -D ${peerDeps.join(' ')}` : `${pm} add -D ${peerDeps.join(' ')}`;
   const peersDevDepsCmd = pm === 'npm' ? `npm install -D ${peerDevDeps.join(' ')}` : `${pm} add -D ${peerDevDeps.join(' ')}`;
@@ -179,6 +200,9 @@ async function initTestHarness () {
     // },
     scripts: s => {
       delete s['vitest:init'];
+      delete s['vitest:install-peers'];
+      delete s['vitest:peers-devDeps'];
+      delete s['vitest:peers-deps'];
       s.test = 'vitest';
       s['vitest:w'] = ` ${pm} run vitest-watch`;
       // test-app: is to make sure we are invoking the correct app
@@ -188,14 +212,21 @@ async function initTestHarness () {
       s['vitest:test-app:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
       s['vitest:test-app:diag'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && NODE_ENV=test ${pm} run test-app:start`;
       s['vitest:diag'] = `NODE_ENV=test ${pm} run strapi start`;
-      s['vitest:peers-devDeps'] = peersDevDepsCmd;
-      // s['vitest:peers-deps'] = peersDepsCmd;
+      if (peerDevDeps.length > 0) s['vitest:peers-devDeps'] = peersDevDepsCmd;
+      if (peerDeps.length > 0) s['vitest:peers-deps'] = peersDepsCmd;
       return s;
     },
   });
   
-  log_warn(`Please run this "new/updated" package.json script: %o to add required packages to your project's %o`, 'vitest:peers-devDeps', 'devDependencies');
-  console.info(`   - You can edit the packages from your "package.json" file.\n   - If you remove any packages from that script, be sure to edit the harness for the ones you remove where the packages are used.`, './tests/helpers/harness');
+  console.info('\n');
+  log_warn(`Please run package.json script(s):`);
+  if (peerDeps.length > 0) {
+    console.info(`   %o to update required packages in your project's %o`, 'vitest:peers-deps', 'dependencies');
+  }
+  if (peerDevDeps.length > 0) {
+    console.info(`   %o to add/update required packages in your project's %o`, 'vitest:peers-devDeps', 'devDependencies');
+  }
+  console.info(chalk.dim`      - You can edit the scripts in your "package.json" file.\n      - If you remove any packages from that script, be sure to edit the harness for the ones you remove where the packages are used.`);
 }
 
 
@@ -204,3 +235,10 @@ initTestHarness().then(() => {
   log(`✨ Done initializing ${pkg.name} harness 🚀, read & finish minor required config before use.`);
 });
 
+
+
+function ensureDependenciesProps (pkg) {
+  if (!pkg.dependencies) pkg.dependencies = {};
+  if (!pkg.devDependencies) pkg.devDependencies = {};
+  if (!pkg.peerDependencies) pkg.peerDependencies = {};
+}
