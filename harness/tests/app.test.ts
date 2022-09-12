@@ -17,7 +17,7 @@ describe(`# App "${(appInfo.name)}"`, () => {
   }, 60000);
   
   
-  test('strapi is defined and ready!', () => {
+  test(`Strapi "${(appInfo.name)}" app is defined and ready!`, () => {
     expect(strapi).to.not.be.undefined;
   });
 });
