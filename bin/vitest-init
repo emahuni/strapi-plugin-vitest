@@ -88,6 +88,11 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
 
 async function initTestHarness () {
   console.info(chalk`{bold   Emanimation {magenta Strapi} {yellow Vitest} {green Harness}.}`);
+  if(!Object.keys(prjPkg.devDependencies).includes(pkg.name)) {
+    log_err(chalk.yellow`The project "${prjPkg.name}" doesn't have "${pkg.name}" installed in its devDependencies!`)
+    return;
+  }
+  
   let pm = preferredPackageManager();
   
   if (pm) {
