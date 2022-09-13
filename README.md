@@ -115,8 +115,8 @@ See example test file `app.test.ts`/`plugin.test.ts`, you can generate other sim
 
 - If tests quits with errors or not, first ensure all required plugin dependencies were installed before using this harness. You can quickly do so by running the added script `pnpm vitest:devDeps` and `pnpm vitest:deps` (if available), you can remove the scripts once you are done with them.
 - Sometimes it may not be clear why the harness is failing to start. To see why startup is failing, if no real followable error is showing:
-  - when strapi-plugin-vitest is used to test applications run `pnpm vitest:diag` which does `NODE_ENV=test pnpm strapi start` 
-  - when strapi-plugin-vitest is used to test plugins run `pnpm vitest:test-app:diag` which does `NODE_ENV=test pnpm vitest:test-app:start` 
+  - when strapi-plugin-vitest is used to test **applications** run `pnpm vitest:diag` which does `NODE_ENV=test pnpm strapi start` 
+  - when strapi-plugin-vitest is used to test **plugins** run `pnpm vitest:test-app:diag` which does `NODE_ENV=test pnpm vitest:test-app:start` 
   
   either commands (for applications or plugins) will run Strapi as usual, but within a test environment. **Any errors being swallowed up by test suite will be thrown**.
 
