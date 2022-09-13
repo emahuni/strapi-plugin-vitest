@@ -93,7 +93,10 @@ To run tests do the following:
 pnpm vitest 
 ```
 
+This will run all tests in the tests directory, according to the vitest.config.js configuration.
 See [Vitest](https://vitest.dev/) for more information about running tests, arguments and options.
+
+If the package under test is a standalone Strapi plugin, then this will build the `test-app` on each run. On the first run, the harness will create a default super admin: `superadmin@test.co.zw` with password: `Password123`. You can use this to login to the admin backend if you run the console, develop or start scripts. See below.
 
 ### Difference with Strapi Unit Testing Guide Documentation
 
