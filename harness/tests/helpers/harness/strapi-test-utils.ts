@@ -135,15 +135,19 @@ export async function createSuperadminAccount (strapi: Strapi, opts: { email?: s
   }
   
   // @ts-expect-error type
-  const user = await strapi.admin.services.user.create({
-    email:             opts.email,
-    firstname:         'admin',
-    lastname:          'admin',
-    password:          opts.password,
-    registrationToken: null,
-    isActive:          true,
-    roles:             superAdminRole ? [superAdminRole.id] : [],
-  });
+  let user = await strapi.admin.services.user.findOne({});
+  if (!user) {
+    // @ts-expect-error type
+    user = await strapi.admin.services.user.create({
+      email:             opts.email,
+      firstname:         'admin',
+      lastname:          'admin',
+      password:          opts.password,
+      registrationToken: null,
+      isActive:          true,
+      roles:             superAdminRole ? [superAdminRole.id] : [],
+    });
+  }
   
   // @ts-expect-error type
   strapi.superadmin = {
