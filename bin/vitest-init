@@ -7,6 +7,7 @@ const paths = require('../paths.js');
 const { modifyPackageJsonFile } = require('modify-json-file');
 // noinspection NpmUsedModulesInstalled
 const { preferredPackageManager } = require('@emanimation/strapi-utils');
+const semver = require('semver');
 
 const pkg = JSON.parse(readFileSync(resolve(paths.PLUGIN_DIR_PATH, './package.json'), { encoding: 'utf8' }));
 ensureDependenciesProps(pkg);
@@ -201,7 +202,7 @@ async function initTestHarness () {
       delete s['vitest:devDeps'];
       delete s['vitest:deps'];
       s.test = 'vitest';
-      s['vitest:w'] = ` ${pm} vitest-watch`;
+      s['vitest:w'] = `${pm} vitest-watch`;
       // test-app: is to make sure we are invoking the correct app
       s['vitest:test-app:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
       s['vitest:test-app:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
@@ -250,17 +251,27 @@ function inferDependencies (defaultType, deps, pluginDeps, pluginDevDeps, prjDep
         })
         .forEach(p => {
           const [name, version] = p;
+          const prjDepVer = prjPkg.dependencies[name]?.replace(/workspace:/, '');
+          const prjDevDepVer = prjPkg.devDependencies[name]?.replace(/workspace:/, '');
           // check if the dependency is already defined in the prjPkg (in both devDependencies & dependencies sections)
           // and just update the version, except for actual strapi packages
           if (prjDeps.includes(name)) {
-            if (!/^@strapi/.test(name) && version !== prjPkg.dependencies[name].replace(/workspace:/, '')) {
-              // todo check if our version is compatible with the current version, complain if not
-              pluginDeps.push(name + '@' + version);
+            if (!/^@strapi/.test(name) && version !== prjDepVer) {
+              //  check if our version is compatible with the current version, complain if not
+              if (semver.subset(version, prjDepVer)) {
+                pluginDeps.push(name + '@' + version);
+              } /*else {
+                log_warn()
+              }*/
             }
           } else if (prjDevDeps.includes(name)) {
-            if (!/^@strapi/.test(name) && version !== prjPkg.devDependencies[name].replace(/workspace:/, '')) {
-              // todo check if our version is compatible with the current version, complain if not
-              pluginDevDeps.push(name + '@' + version);
+            if (!/^@strapi/.test(name) && version !== prjDevDepVer) {
+              // check if our version is compatible with the current version, complain if not
+              if (semver.subset(version, prjDevDepVer)) {
+                pluginDevDeps.push(name + '@' + version);
+              } /*else {
+                log_warn()
+              }*/
             }
           } else {
             // else just add it to either dependencies or devDependencies

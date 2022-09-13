@@ -18,6 +18,7 @@
     "fs-extra": "^10.1.0",
     "lodash.debounce": "^4.0.8",
     "modify-json-file": "^1.2.2",
+    "semver": "^7.3.7",
     "yargs": "^17.5.1"
   },
   "pluginDependencies": {},
