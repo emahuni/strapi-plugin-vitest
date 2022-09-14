@@ -89,8 +89,8 @@ async function renameIfExistsAndCopy (sourcePath, targetPath) {
 
 async function initTestHarness () {
   console.info(chalk`{bold   Emanimation {magenta Strapi} {yellow Vitest} {green Harness}.}`);
-  if(!Object.keys(prjPkg.devDependencies).includes(pkg.name)) {
-    log_err(chalk.yellow`The project "${prjPkg.name}" doesn't have "${pkg.name}" installed in its devDependencies!`)
+  if (!Object.keys(prjPkg.devDependencies).includes(pkg.name)) {
+    log_err(chalk.yellow`The project "${prjPkg.name}" doesn't have "${pkg.name}" installed in its devDependencies!`);
     return;
   }
   
@@ -203,13 +203,16 @@ async function initTestHarness () {
       delete s['vitest:deps'];
       s.test = 'vitest';
       s['vitest:w'] = `${pm} vitest-watch`;
-      // test-app: is to make sure we are invoking the correct app
-      s['vitest:test-app:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
-      s['vitest:test-app:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
-      s['vitest:test-app:start'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:start`;
-      s['vitest:test-app:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
-      s['vitest:test-app:diag'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && NODE_ENV=test ${pm} run test-app:start`;
-      s['vitest:diag'] = `NODE_ENV=test ${pm} run strapi start`;
+      if (isPrjPlugin) {
+        // test-app: is to make sure we are invoking the correct app
+        s['vitest:test-app:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
+        s['vitest:test-app:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
+        s['vitest:test-app:start'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:start`;
+        s['vitest:test-app:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
+        s['vitest:test-app:diag'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && NODE_ENV=test ${pm} run test-app:start`;
+      } else {
+        s['vitest:diag'] = `NODE_ENV=test ${pm} run strapi start`;
+      }
       if (pluginDevDeps.length > 0) s['vitest:devDeps'] = peersDevDepsCmd;
       if (pluginDeps.length > 0) s['vitest:deps'] = peersDepsCmd;
       return s;
