@@ -5,7 +5,7 @@ import PluginIcon from './components/PluginIcon';
 
 import { packageInfo } from '@emanimation/strapi-utils';
 
-const pluginInfo = packageInfo();
+const pluginInfo = packageInfo(__dirname);
 
 export default {
   register (app) {

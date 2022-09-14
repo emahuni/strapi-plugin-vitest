@@ -7,7 +7,7 @@
 import React from 'react';
 import { packageInfo } from '@emanimation/strapi-utils';
 
-const pluginInfo  = packageInfo();
+const pluginInfo  = packageInfo(__dirname);
 
 const HomePage: React.VoidFunctionComponent = () => {
   return (

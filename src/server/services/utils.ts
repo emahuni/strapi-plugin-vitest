@@ -2,7 +2,7 @@ import fs from 'fs';
 import type { Strapi } from '@strapi/strapi';
 import { packageInfo } from '@emanimation/strapi-utils';
 
-const pluginInfo = packageInfo();
+const pluginInfo = packageInfo(__dirname);
 
 export default function ({ strapi }: { strapi: Strapi }) {
   return {

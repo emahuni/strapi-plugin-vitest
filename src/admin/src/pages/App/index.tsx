@@ -11,7 +11,7 @@ import { NotFound } from '@strapi/helper-plugin';
 import HomePage from '../HomePage';
 import { packageInfo } from '@emanimation/strapi-utils';
 
-const pluginInfo = packageInfo();
+const pluginInfo = packageInfo(__dirname);
 
 const App: React.VoidFunctionComponent = () => {
   return (
