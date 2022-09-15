@@ -38,13 +38,12 @@ The initialization script:
 - _**creates**_ a `config/env/test/database.(js|ts)` file if missing
 - _**adds**_ the following scripts to your `package.json` assist with initialization, usage and other chores _(please review them for correctness)_:
   - `vitest:w` - executes script to run vitest in watch mode (custom watcher)
-  - `vitest:test-app:clean` - executes script to clean test application build artifacts (only available with plugins)
-  - `vitest:test-app:develop` - executes script to run the test application in develop mode (only available with plugins)
-  - `vitest:test-app:start` - executes script to run the test application in start mode (only available with plugins)
-  - `vitest:test-app:console` - executes script to run the test application in console mode (only available with plugins)
-  - `vitest:test-app:diag` - executes script to run the test application in start mode, but in a test environment to allow you to diagnose problems. See troubleshooting for more information.
-  - `vitest:diag` - executes script to run your application in start mode, but in a test environment to allow you to diagnose problems. See troubleshooting for more information.
-  - `vitest:devDeps` - executes script to install required dev-dependencies, just run it after every init. You can edit or remove this script once you are done with it.
+  - `vitest:clean` - executes script to clean test application build artifacts (only available when testing standalone plugins)
+  - `vitest:develop` - executes script to run the test application in develop mode (only available when testing standalone plugins)
+  - `vitest:start` - executes script to run the test application in start mode (only available when testing standalone plugins)
+  - `vitest:console` - executes script to run the test application in console mode (only available when testing standalone plugins)
+  - `vitest:diag` - executes script to run your application or the test-app application (when testing standalone plugins) in start mode, but in a test environment to allow you to diagnose problems. See troubleshooting for more information.
+  - `vitest:dev-deps` - executes script to install required dev-dependencies, just run it after every init. You can edit or remove this script once you are done with it.
   - `vitest:deps` - same as above but for dependencies (will only update any packages you moved to dependencies if applicable)
 - tells you important dependencies that you must install inorder to use the harness.
 
@@ -116,10 +115,9 @@ See example test file `app.test.ts`/`plugin.test.ts`, you can generate other sim
 
 #### Tests just quit with exist code 1
 
-- If tests quits with errors or not, first ensure all required plugin dependencies were installed before using this harness. You can quickly do so by running the added script `pnpm vitest:devDeps` and `pnpm vitest:deps` (if available), you can remove the scripts once you are done with them.
+- If tests quits with errors or not, first ensure all required plugin dependencies were installed before using this harness. You can quickly do so by running the auto-added scripts `pnpm vitest:dev-deps` and `pnpm vitest:deps` (if available), you can remove the scripts once you are done with them.
 - Sometimes it may not be clear why the harness is failing to start. To see why startup is failing, if no real followable error is showing:
-  - when strapi-plugin-vitest is used to test **applications** run `pnpm vitest:diag` which does `NODE_ENV=test pnpm strapi start` 
-  - when strapi-plugin-vitest is used to test **plugins** run `pnpm vitest:test-app:diag` which does `NODE_ENV=test pnpm vitest:test-app:start` 
+  - run `pnpm vitest:diag` which runs `NODE_ENV=test pnpm strapi start` when `strapi-plugin-vitest` is used to test an **application**, or `NODE_ENV=test pnpm vitest:start` when testing a standalone **plugin**
   
   either commands (for applications or plugins) will run Strapi as usual, but within a test environment. **Any errors being swallowed up by test suite will be thrown**.
 

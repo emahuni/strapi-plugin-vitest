@@ -197,23 +197,37 @@ async function initTestHarness () {
     //   return d;
     // },
     scripts: s => {
+      // clean up old versions scripts
       delete s['vitest:init'];
       delete s['vitest:install-peers'];
       delete s['vitest:devDeps'];
+      delete s['vitest:test-app:clean'];
+      delete s['vitest:test-app:develop'];
+      delete s['vitest:test-app:start'];
+      delete s['vitest:test-app:console'];
+      delete s['vitest:test-app:diag'];
+      // clean up old scripts that may not be available anymore
+      delete s['vitest:clean'];
+      delete s['vitest:develop'];
+      delete s['vitest:start'];
+      delete s['vitest:console'];
+      delete s['vitest:diag'];
+      delete s['vitest:dev-deps'];
       delete s['vitest:deps'];
+      
       s.test = 'vitest';
       s['vitest:w'] = `${pm} vitest-watch`;
       if (isPrjPlugin) {
         // test-app: is to make sure we are invoking the correct app
-        s['vitest:test-app:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
-        s['vitest:test-app:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
-        s['vitest:test-app:start'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:start`;
-        s['vitest:test-app:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
-        s['vitest:test-app:diag'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && NODE_ENV=test ${pm} run test-app:start`;
+        s['vitest:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
+        s['vitest:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
+        s['vitest:start'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:start`;
+        s['vitest:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;
+        s['vitest:diag'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && NODE_ENV=test ${pm} run test-app:start`;
       } else {
         s['vitest:diag'] = `NODE_ENV=test ${pm} run strapi start`;
       }
-      if (pluginDevDeps.length > 0) s['vitest:devDeps'] = peersDevDepsCmd;
+      if (pluginDevDeps.length > 0) s['vitest:dev-deps'] = peersDevDepsCmd;
       if (pluginDeps.length > 0) s['vitest:deps'] = peersDepsCmd;
       return s;
     },
@@ -226,7 +240,7 @@ async function initTestHarness () {
       console.info(`   %o to update required packages in your project's %o`, 'vitest:deps', 'dependencies');
     }
     if (pluginDevDeps.length > 0) {
-      console.info(`   %o to add/update required packages in your project's %o`, 'vitest:devDeps', 'devDependencies');
+      console.info(`   %o to add/update required packages in your project's %o`, 'vitest:dev-deps', 'devDependencies');
     }
     console.info(chalk.dim`      - You can edit the scripts in your "package.json" file.\n      - If you remove any packages from that script, be sure to edit the harness for the ones you remove where the packages are used.\n      - You can remove the scripts once you are done.`);
   }
