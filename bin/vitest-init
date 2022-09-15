@@ -219,7 +219,8 @@ async function initTestHarness () {
       s['vitest:w'] = `${pm} vitest-watch`;
       if (isPrjPlugin) {
         // test-app: is to make sure we are invoking the correct app
-        s['vitest:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rm -rfv dist; rm -fv tsconfig.tsbuildinfo; rm -fv node_modules; rm -rfv .cache &&  echo ' ✨  Done cleaning test-app, run tests, develop, console or start to rebuild ✓'`;
+        s['vitest:clean'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')}; rimraf --no-glob dist tsconfig.tsbuildinfo node_modules .cache &&  echo ' ✨  Done cleaning test-app, run tests, build, develop, console or start to rebuild ✓'`;
+        s['vitest:build'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:build`;
         s['vitest:develop'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:develop`;
         s['vitest:start'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:start`;
         s['vitest:console'] = `cd ${resolve(paths.CWD, 'tests/helpers/harness/test-app')} && ${pm} run test-app:console`;

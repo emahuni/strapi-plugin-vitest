@@ -6,7 +6,7 @@
     "test-app:develop": "strapi develop",
     "test-app:start": "strapi start",
     "test-app:console": "strapi console",
-    "test-app:build": "rm -rfv dist .cache node_modules; strapi build",
+    "test-app:build": "rimraf dist .cache node_modules; strapi build",
     "strapi": "strapi"
   },
   "author": {

@@ -39,6 +39,7 @@ The initialization script:
 - _**adds**_ the following scripts to your `package.json` assist with initialization, usage and other chores _(please review them for correctness)_:
   - `vitest:w` - executes script to run vitest in watch mode (custom watcher)
   - `vitest:clean` - executes script to clean test application build artifacts (only available when testing standalone plugins)
+  - `vitest:build` - executes script to build test application though not necessary, happens automatically when you run any of the following scripts (only available when testing standalone plugins)
   - `vitest:develop` - executes script to run the test application in develop mode (only available when testing standalone plugins)
   - `vitest:start` - executes script to run the test application in start mode (only available when testing standalone plugins)
   - `vitest:console` - executes script to run the test application in console mode (only available when testing standalone plugins)
