@@ -1,6 +1,6 @@
 # 🚀 Getting started with Strapi
 
-This is a plugin testing harness application. 
+This is a plugin testing harness application used to test standalone plugins. 
 
 ### `develop`
 
